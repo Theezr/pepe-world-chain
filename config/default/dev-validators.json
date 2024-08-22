@@ -1,0 +1,36 @@
+{
+	"keys": [
+		{
+			"address": "klyznbosu8hm57dgosc5a5ozg9pcbd3natw4jb4t8",
+			"keyPath": "m/44'/134'/45'",
+			"publicKey": "12e30fe183831d732803116a2046a6b3939b9dc52127b4ec28a581e6a098721f",
+			"privateKey": "73f161e5e97262a6f2eaaaed2b864378c93dc44884c265dc5f1193075ea076d712e30fe183831d732803116a2046a6b3939b9dc52127b4ec28a581e6a098721f",
+			"plain": {
+				"generatorKeyPath": "m/25519'/134'/0'/45'",
+				"generatorKey": "db2cabc0250d94f76bdee10393386fb221270b4b5086b33b2973fdadec962247",
+				"generatorPrivateKey": "3f7634c80be060d134270b7bceabf2a2e86ceb7fa6f6a44709335f388187cc69db2cabc0250d94f76bdee10393386fb221270b4b5086b33b2973fdadec962247",
+				"blsKeyPath": "m/12381/134/0/45",
+				"blsKey": "a975f566a92d752b04e846e0acb9c88ba2ffb0908bdcf0c60a8c06b238d669078ecaefe1b4c89433d1ebacf23f6c4739",
+				"blsProofOfPossession": "b27e9fb4ba9bc65b2ce1743e5b64344a2aa2e940206e88531936f003030593f6d8da01fdb35b37a1a4837327e7957fcf165888c704d6997abec9efa6dfb37db062caaf05e76ef1287f7d8311a1168b129a3e06167bb1af194e35a5394f1921dd",
+				"blsPrivateKey": "5e248767cb10d9fc8d5d1797f699d9196b640c00c563390833a914d88db91453"
+			},
+			"encrypted": {}
+		},
+		{
+			"address": "klyzywapkwwftkpwua4yatw8d7ovnwytfqbpv7xmr",
+			"keyPath": "m/44'/134'/6'",
+			"publicKey": "483b70a97d1760db5682994616230e95a0bc2eb52fe89fd4dd6682b74bb188d6",
+			"privateKey": "0d3e5477e2c81aa4a34b917c62b376e7a79fa72696882cc4575a446eda6e38c9483b70a97d1760db5682994616230e95a0bc2eb52fe89fd4dd6682b74bb188d6",
+			"plain": {
+				"generatorKeyPath": "m/25519'/134'/0'/6'",
+				"generatorKey": "9de49e209b5d165fdf451acb60cc1808db5ca9ad372a2f852911e3824db0f41a",
+				"generatorPrivateKey": "1b052739caed14ceb2ab43e23238bb94c9e12a2afc19ce294b28491e03fc84069de49e209b5d165fdf451acb60cc1808db5ca9ad372a2f852911e3824db0f41a",
+				"blsKeyPath": "m/12381/134/0/6",
+				"blsKey": "81f79f9a704a3ea635aaaeab63a003cada22b06f603c2fda5d93e80819cc8c416ed09de73f93d8fdeddc11cebf2c352f",
+				"blsProofOfPossession": "a4d58a86b3fdda36e51999e819b26e705ccaf6d500379e283589ba79fca7cb7e41aefa8b7e00b7481bf4eff341d50da70b19d38e1770f76aeba7caa25bc587a4f03e016df9d42e4b49b378f11c1fa0071797258f1befb7c4a7da95957f2ef759",
+				"blsPrivateKey": "00367b5bf3a3f34f53aabdd0a58b5723cda34963e0cd2f28e13b76d8e787e063"
+			},
+			"encrypted": {}
+		}
+	]
+}
