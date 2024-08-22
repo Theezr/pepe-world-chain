@@ -6,7 +6,7 @@ This project was bootstrapped with [Klayr SDK](https://github.com/Klayrhq/klayr-
 
 ```
 ./bin/run start
-npm run build && ./bin/run start --config config/custom_config.json --overwrite-config
+yarn build && ./bin/run start --config config/custom_config.json --overwrite-config
 ```
 
 ### Add a new module
