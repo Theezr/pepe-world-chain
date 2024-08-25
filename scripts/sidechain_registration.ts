@@ -19,7 +19,7 @@ import { apiClient } from 'klayr-sdk';
 		// const testClient = await apiClient.createWSClient(`wss://pepe-core.klayr.dev/rpc-ws`);
 		// const testNodeInfo = await testClient.invoke('system_getNodeInfo');
 		// console.log({ testNodeInfo });
-		return;
+		// return;
 
 		// Get info about the active sidechain validators and the certificate threshold
 		const { validators: sidechainActiveValidators, certificateThreshold } =

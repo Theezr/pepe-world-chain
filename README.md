@@ -9,6 +9,22 @@ This project was bootstrapped with [Klayr SDK](https://github.com/Klayrhq/klayr-
 yarn build && ./bin/run start --config config/custom_config.json --overwrite-config
 ```
 
+### Drip Plugin
+
+```
+./bin/run endpoint:invoke drip_fundTokens '{"address": "kly4mba244me87reyg9fegcy2cesdfw6gq9r8we5x"}' --pretty
+```
+
+```
+./bin/run endpoint:invoke drip_authorize '{"password": "testtest", "enable": true}' --pretty
+```
+
+### Get token balances
+
+```
+./bin/run endpoint:invoke token_getBalances '{"address":"kly4mba244me87reyg9fegcy2cesdfw6gq9r8we5x"}' --pretty
+```
+
 ### Add a new module
 
 ```
