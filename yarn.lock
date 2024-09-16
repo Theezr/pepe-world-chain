@@ -1423,10 +1423,10 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@klayr/api-client@^6.1.1":
-  version "6.1.1"
-  resolved "https://registry.npmjs.org/@klayr/api-client/-/api-client-6.1.1.tgz"
-  integrity sha512-cjhzVHq/pcEiECG456zZjsRMjyqiQ8T2rJYPBF/Xu9txlguOvE9q7iDRoEtYTy3wpqy9zZaM8L6tMibx80dHbA==
+"@klayr/api-client@^6.1.1", "@klayr/api-client@^6.1.2":
+  version "6.1.2"
+  resolved "https://registry.yarnpkg.com/@klayr/api-client/-/api-client-6.1.2.tgz#82f0280683d5d02e9d5e189caae60cd610c742c8"
+  integrity sha512-yLgXsEMg1ZkGmLDmvcg3Oj63w3nrCMygQBexBmHIm+uI7b4dJZCyATtuGwASeV00r6TWkg1jMsWgwDSAziO78A==
   dependencies:
     "@klayr/codec" "^0.5.1"
     "@klayr/cryptography" "^4.1.1"
@@ -1436,19 +1436,19 @@
     ws "8.18.0"
     zeromq "6.0.0-beta.6"
 
-"@klayr/chain-connector-plugin@0.2.1":
-  version "0.2.1"
-  resolved "https://registry.npmjs.org/@klayr/chain-connector-plugin/-/chain-connector-plugin-0.2.1.tgz"
-  integrity sha512-A6T0tjvKtQgJpGKqsWH29s1k5kbylinmMr3jSOJU6VohLRjqqFzymE5pCG3CsoxVxsaGIa65vLSNubZdXC7kLw==
+"@klayr/chain-connector-plugin@0.2.2":
+  version "0.2.2"
+  resolved "https://registry.npmjs.org/@klayr/chain-connector-plugin/-/chain-connector-plugin-0.2.2.tgz"
+  integrity sha512-w/tUpj3Pe2LW0id7b1pqTsH1RK2f7ogsWDGZSVTjbZ01SeIy89Nt/ERYdYaSr4TBcYp9TSi6CtfboQQ66jMlcg==
   dependencies:
     debug "4.3.4"
     fs-extra "11.1.0"
-    klayr-sdk "^6.1.2"
+    klayr-sdk "6.1.3"
 
-"@klayr/chain@^0.6.1":
-  version "0.6.1"
-  resolved "https://registry.npmjs.org/@klayr/chain/-/chain-0.6.1.tgz"
-  integrity sha512-ujNgIVlMdrX8dZ0nmJWgRV3hL+iDULNK6qKPEepSBfsRjWhreroeFOKW/UmKuiw7w4+uTzXt+oGInwT7jSd1cA==
+"@klayr/chain@^0.6.1", "@klayr/chain@^0.6.2":
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/@klayr/chain/-/chain-0.6.2.tgz#464cd248f4dd8968ff021746becab10cd921e8b9"
+  integrity sha512-NRTv6cOXfUS21zj32D+N1/OkNThBEJYsjSEKVPrne6oRpVNZhRdWRgI4bY+3DFJ8IBFX8/IAObB7q2eIpNVZWw==
   dependencies:
     "@klayr/codec" "^0.5.1"
     "@klayr/cryptography" "^4.1.1"
@@ -1458,12 +1458,12 @@
     "@liskhq/lisk-db" "0.3.7"
     debug "4.3.4"
 
-"@klayr/client@^6.1.1":
-  version "6.1.1"
-  resolved "https://registry.npmjs.org/@klayr/client/-/client-6.1.1.tgz"
-  integrity sha512-tgqLb6vB4HN5pOVT6pHsEuW3Mrxr5KeGEBPFeo9tqpoF9MMCTbcwbFDuIB3+a0SI5dJxRQ49YvT0LgVK3gQVXg==
+"@klayr/client@^6.1.2":
+  version "6.1.2"
+  resolved "https://registry.npmjs.org/@klayr/client/-/client-6.1.2.tgz"
+  integrity sha512-Z7iFGZor0QpqoHyZj6Y597zyFn+O5NdE9pZ6cAkRw1jUM/hQY215S8t0A1NdsnPxwIt3fscWarFlIKzOcL/qig==
   dependencies:
-    "@klayr/api-client" "^6.1.1"
+    "@klayr/api-client" "^6.1.2"
     "@klayr/codec" "^0.5.1"
     "@klayr/cryptography" "^4.1.1"
     "@klayr/passphrase" "^4.1.1"
@@ -1492,58 +1492,58 @@
     hash-wasm "4.9.0"
     tweetnacl "1.0.3"
 
-"@klayr/dashboard-plugin@0.4.1":
-  version "0.4.1"
-  resolved "https://registry.npmjs.org/@klayr/dashboard-plugin/-/dashboard-plugin-0.4.1.tgz"
-  integrity sha512-hjQjARtJpVjYdTeoT0/u3Gyq6W5hLsxGwaFo5p65OJEXHN/ye0no/2FVIsgaY6bncRBGEcx6H8J7vOzONsIFbA==
+"@klayr/dashboard-plugin@0.4.2":
+  version "0.4.2"
+  resolved "https://registry.npmjs.org/@klayr/dashboard-plugin/-/dashboard-plugin-0.4.2.tgz"
+  integrity sha512-DiQxSljHNZowskyxMYQw8VrXNSAJE19TUoBjeh6DoavEf/7q33oDc+PiabE0THTi+zz5xaO/kTlyaSTGquRwNw==
   dependencies:
     "@csstools/normalize.css" "12.0.0"
-    "@klayr/client" "^6.1.1"
+    "@klayr/client" "^6.1.2"
     express "4.19.2"
     json-format-highlight "1.0.4"
-    klayr-sdk "^6.1.2"
+    klayr-sdk "6.1.3"
     react "^17.0.1"
     react-dom "^17.0.1"
     react-router-dom "^5.2.0"
     react-select "4.3.0"
 
-"@klayr/faucet-plugin@0.4.1":
-  version "0.4.1"
-  resolved "https://registry.npmjs.org/@klayr/faucet-plugin/-/faucet-plugin-0.4.1.tgz"
-  integrity sha512-Ksmj2Dx0rw3DdFDyOMdhpfhkBzd9IjVOgkbB0KeY4jAU3ypbcLF280clRqw8yudyUC/+DGyB2BIIqQvEmce+JQ==
+"@klayr/faucet-plugin@0.4.2":
+  version "0.4.2"
+  resolved "https://registry.npmjs.org/@klayr/faucet-plugin/-/faucet-plugin-0.4.2.tgz"
+  integrity sha512-FlK4WEsdEx2XUFmWT2m7YNBNhJc+Rshz/mChT1Z3Oyf5VZZSdRicLdQaYoxwXuo0YJwmWWhd3DWOp0tkY68ouQ==
   dependencies:
     "@csstools/normalize.css" "12.0.0"
-    "@klayr/api-client" "^6.1.1"
-    "@klayr/client" "^6.1.1"
+    "@klayr/api-client" "^6.1.2"
+    "@klayr/client" "^6.1.2"
     "@klayr/cryptography" "^4.1.1"
     "@klayr/transactions" "^6.1.1"
     "@klayr/utils" "^0.4.1"
     "@klayr/validator" "^0.9.1"
     axios "1.7.4"
     express "4.19.2"
-    klayr-sdk "^6.1.2"
+    klayr-sdk "6.1.3"
     react "^17.0.1"
     react-dom "^17.0.1"
     react-router-dom "^5.2.0"
 
-"@klayr/generator-plugin@0.5.1":
-  version "0.5.1"
-  resolved "https://registry.npmjs.org/@klayr/generator-plugin/-/generator-plugin-0.5.1.tgz"
-  integrity sha512-R/ugMPHiHtz4YgjA7KHkQxl+cpCT64A7xfYgBGT5W9R/er9yugLLEj/GsAVIe9WicGvGw2sF4ikPi1rOcGMNjQ==
+"@klayr/generator-plugin@0.5.2":
+  version "0.5.2"
+  resolved "https://registry.npmjs.org/@klayr/generator-plugin/-/generator-plugin-0.5.2.tgz"
+  integrity sha512-/hcmQXTsflS1vM/FYh8MO2ghH1DsogemwwlDzxy+nKruWGyFYKho7TWUbwRgY7zZ8eRYo0FYhZHcmwl0s3xt5A==
   dependencies:
     debug "4.3.4"
     fs-extra "11.1.0"
-    klayr-sdk "^6.1.2"
+    klayr-sdk "6.1.3"
 
-"@klayr/monitor-plugin@0.5.1":
-  version "0.5.1"
-  resolved "https://registry.npmjs.org/@klayr/monitor-plugin/-/monitor-plugin-0.5.1.tgz"
-  integrity sha512-cRUwzmaAMScbLKW6NxST/IibKwGTHIqAcUsWYLXGI5dVpM9F0qRqLs4IwaCDEcQ9b10TXAzLpt9J40AsMi6fEA==
+"@klayr/monitor-plugin@0.5.2":
+  version "0.5.2"
+  resolved "https://registry.npmjs.org/@klayr/monitor-plugin/-/monitor-plugin-0.5.2.tgz"
+  integrity sha512-4udSR+VYrlKl2xqYCA2gktcvMe3bfIiSBqC59Lr49b7ZK2j0qicWc5wtY1hkN+CSBIvoR1NilqK4eCEVXBgOMA==
   dependencies:
     cors "2.8.5"
     express "4.19.2"
     express-rate-limit "6.7.0"
-    klayr-sdk "^6.1.2"
+    klayr-sdk "6.1.3"
     netmask "2.0.2"
 
 "@klayr/p2p@^0.10.1":
@@ -1566,14 +1566,14 @@
   dependencies:
     bip39 "3.0.3"
 
-"@klayr/report-misbehavior-plugin@0.5.1":
-  version "0.5.1"
-  resolved "https://registry.npmjs.org/@klayr/report-misbehavior-plugin/-/report-misbehavior-plugin-0.5.1.tgz"
-  integrity sha512-Z/Ys3UCjdmpFt7b4aG89QbsAbrRDdUgRLNBF98wPLtauBvly3FyHZzbQ3dTWzwZxzmAvsBzUZR99opmSeFpAuA==
+"@klayr/report-misbehavior-plugin@0.5.2":
+  version "0.5.2"
+  resolved "https://registry.npmjs.org/@klayr/report-misbehavior-plugin/-/report-misbehavior-plugin-0.5.2.tgz"
+  integrity sha512-RnNwNQ5zvsU+ORVAJi9s+PcI/bh65zJyIxIhvsdG/guFqtVUHkGHLfbrubtNU0ZVRzjUavNvipmh2GDyqMnxEg==
   dependencies:
     "@klayr/cryptography" "^4.1.1"
     fs-extra "11.1.0"
-    klayr-sdk "^6.1.2"
+    klayr-sdk "6.1.3"
 
 "@klayr/transaction-pool@^0.8.1":
   version "0.8.1"
@@ -2831,7 +2831,7 @@
   dependencies:
     "@types/node" "*"
 
-"@types/node@*", "@types/node@18.15.3":
+"@types/node@*", "@types/node@18.15.3", "@types/node@^16 || ^18":
   version "18.15.3"
   resolved "https://registry.npmjs.org/@types/node/-/node-18.15.3.tgz"
   integrity sha512-p6ua9zBxz5otCmbpb5D3U4B5Nanw6Pk3PPyX05xnxbB/fRv71N7CPmORg7uAD5P70T0xmx1pzAx/FUfa5X+3cw==
@@ -2845,13 +2845,6 @@
   version "15.14.9"
   resolved "https://registry.npmjs.org/@types/node/-/node-15.14.9.tgz"
   integrity sha512-qjd88DrCxupx/kJD5yQgZdcYKZKSIGBVDIBE1/LTGcNm3d2Np/jxojkdePDdfnBHJc5W7vSMpbJ1aB7p/Py69A==
-
-"@types/node@^16 || ^18":
-  version "18.19.45"
-  resolved "https://registry.npmjs.org/@types/node/-/node-18.19.45.tgz"
-  integrity sha512-VZxPKNNhjKmaC1SUYowuXSRSMGyQGmQjvvA1xE4QZ0xce2kLtEhPDS+kqpCPBZYgqblCLQ2DAjSzmgCM5auvhA==
-  dependencies:
-    undici-types "~5.26.4"
 
 "@types/node@^22.1.0":
   version "22.5.0"
@@ -5197,46 +5190,9 @@ express-rate-limit@6.7.0:
   resolved "https://registry.npmjs.org/express-rate-limit/-/express-rate-limit-6.7.0.tgz"
   integrity sha512-vhwIdRoqcYB/72TK3tRZI+0ttS8Ytrk24GfmsxDXK9o9IhHNO5bXRiXQSExPQ4GbaE5tvIS7j1SGrxsuWs+sGA==
 
-express@4.19.2:
+express@4.19.2, express@^4.19.2:
   version "4.19.2"
   resolved "https://registry.npmjs.org/express/-/express-4.19.2.tgz"
-  integrity sha512-5T6nhjsT+EOMzuck8JjBHARTHfMht0POzlA60WV2pMD3gyXw2LZnZ+ueGdNxG+0calOJcWKbpFcuzLZ91YWq9Q==
-  dependencies:
-    accepts "~1.3.8"
-    array-flatten "1.1.1"
-    body-parser "1.20.2"
-    content-disposition "0.5.4"
-    content-type "~1.0.4"
-    cookie "0.6.0"
-    cookie-signature "1.0.6"
-    debug "2.6.9"
-    depd "2.0.0"
-    encodeurl "~1.0.2"
-    escape-html "~1.0.3"
-    etag "~1.8.1"
-    finalhandler "1.2.0"
-    fresh "0.5.2"
-    http-errors "2.0.0"
-    merge-descriptors "1.0.1"
-    methods "~1.1.2"
-    on-finished "2.4.1"
-    parseurl "~1.3.3"
-    path-to-regexp "0.1.7"
-    proxy-addr "~2.0.7"
-    qs "6.11.0"
-    range-parser "~1.2.1"
-    safe-buffer "5.2.1"
-    send "0.18.0"
-    serve-static "1.15.0"
-    setprototypeof "1.2.0"
-    statuses "2.0.1"
-    type-is "~1.6.18"
-    utils-merge "1.0.1"
-    vary "~1.1.2"
-
-express@^4.19.2:
-  version "4.19.2"
-  resolved "https://registry.yarnpkg.com/express/-/express-4.19.2.tgz#e25437827a3aa7f2a827bc8171bbbb664a356465"
   integrity sha512-5T6nhjsT+EOMzuck8JjBHARTHfMht0POzlA60WV2pMD3gyXw2LZnZ+ueGdNxG+0calOJcWKbpFcuzLZ91YWq9Q==
   dependencies:
     accepts "~1.3.8"
@@ -5563,7 +5519,7 @@ fs.realpath@^1.0.0:
 
 fsevents@^2.3.2:
   version "2.3.3"
-  resolved "https://registry.yarnpkg.com/fsevents/-/fsevents-2.3.3.tgz#cac6407785d03675a2a5e1a5305c697b347d90d6"
+  resolved "https://registry.npmjs.org/fsevents/-/fsevents-2.3.3.tgz"
   integrity sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==
 
 function-bind@^1.1.2:
@@ -7101,14 +7057,14 @@ keyv@^4.5.3:
   dependencies:
     json-buffer "3.0.1"
 
-klayr-commander@6.1.1:
-  version "6.1.1"
-  resolved "https://registry.yarnpkg.com/klayr-commander/-/klayr-commander-6.1.1.tgz#0418d238354f66347a9f5e3b2c9771ff0709074a"
-  integrity sha512-XeOdqAdsH6S7I6STvSy/aDbb0JMardyh2gfe6norDn69Gc5+XqbSg8y8xDBYoc38mSiKupzNN1QEri8W/YCgPg==
+klayr-commander@6.1.2:
+  version "6.1.2"
+  resolved "https://registry.npmjs.org/klayr-commander/-/klayr-commander-6.1.2.tgz"
+  integrity sha512-99lgHb3rvNHjtu3knCF232DQ0B7HgdfQBsmYIQ9BQbJ9fz9/+8ddrLQsYNxHFoipyclVRHhR9MLfvCFx5rZMUw==
   dependencies:
-    "@klayr/api-client" "^6.1.1"
-    "@klayr/chain" "^0.6.1"
-    "@klayr/client" "^6.1.1"
+    "@klayr/api-client" "^6.1.2"
+    "@klayr/chain" "^0.6.2"
+    "@klayr/client" "^6.1.2"
     "@klayr/codec" "^0.5.1"
     "@klayr/cryptography" "^4.1.1"
     "@klayr/passphrase" "^4.1.1"
@@ -7126,7 +7082,7 @@ klayr-commander@6.1.1:
     cli-table3 "0.6.0"
     fs-extra "11.1.0"
     inquirer "8.2.5"
-    klayr-framework "^0.12.1"
+    klayr-framework "0.12.3"
     listr "0.14.3"
     progress "2.0.3"
     semver "7.5.2"
@@ -7137,7 +7093,7 @@ klayr-commander@6.1.1:
     yeoman-environment "3.12.1"
     yeoman-generator "5.7.0"
 
-klayr-framework@0.12.2-alpha.0, klayr-framework@^0.12.1:
+klayr-framework@0.12.2-alpha.0, klayr-framework@0.12.3, klayr-framework@^0.12.3:
   version "0.12.2-alpha.0"
   resolved "https://registry.yarnpkg.com/klayr-framework/-/klayr-framework-0.12.2-alpha.0.tgz#89836df0b69c2aba3239b6114a99c74bf071f231"
   integrity sha512-z8x9vJya31FNbU0gsPZDVtFLLfmVcY4KuzzZqEdiwy7VWRCuH927R29tV/AIkQO4vRceeJrY+cn00VDYZ2Be+g==
@@ -7164,13 +7120,13 @@ klayr-framework@0.12.2-alpha.0, klayr-framework@^0.12.1:
     ws "8.18.0"
     zeromq "6.0.0-beta.6"
 
-klayr-sdk@6.1.2, klayr-sdk@^6.1.2:
-  version "6.1.2"
-  resolved "https://registry.npmjs.org/klayr-sdk/-/klayr-sdk-6.1.2.tgz"
-  integrity sha512-LMHI+neGtZ8sjSWuN6kEzw66u9/1bkZLLVH7C3IJxsVkyV/NKJvsvRi+1khmbWPeUbigQ6ZHvEiIwdW+RREOUg==
+klayr-sdk@6.1.3:
+  version "6.1.3"
+  resolved "https://registry.npmjs.org/klayr-sdk/-/klayr-sdk-6.1.3.tgz"
+  integrity sha512-rDzFWTxWwXlL2qC/SO6bokObVNgzU3S5iuF9vX2jxc/fgUJz2YLPEVZMFRvV7HJMBZo5LknHQ+XW5Eli3A2nqQ==
   dependencies:
-    "@klayr/api-client" "^6.1.1"
-    "@klayr/chain" "^0.6.1"
+    "@klayr/api-client" "^6.1.2"
+    "@klayr/chain" "^0.6.2"
     "@klayr/codec" "^0.5.1"
     "@klayr/cryptography" "^4.1.1"
     "@klayr/p2p" "^0.10.1"
@@ -7181,7 +7137,7 @@ klayr-sdk@6.1.2, klayr-sdk@^6.1.2:
     "@klayr/utils" "^0.4.1"
     "@klayr/validator" "^0.9.1"
     "@liskhq/lisk-db" "0.3.7"
-    klayr-framework "^0.12.1"
+    klayr-framework "^0.12.3"
 
 kleur@^3.0.3:
   version "3.0.3"
@@ -9743,7 +9699,7 @@ table@^6.0.4:
     string-width "^4.2.3"
     strip-ansi "^6.0.1"
 
-tar@6.1.11:
+tar@6.1.11, tar@^6.1.11:
   version "6.1.11"
   resolved "https://registry.npmjs.org/tar/-/tar-6.1.11.tgz"
   integrity sha512-an/KZQzQUkZCkuoAA64hM92X0Urb6VpRhAFllDzz44U2mcD5scmT3zBc4VgVpkugF580+DQn8eAFSyoQt0tznA==
@@ -9767,7 +9723,7 @@ tar@6.1.12:
     mkdirp "^1.0.3"
     yallist "^4.0.0"
 
-tar@^6.0.2, tar@^6.1.0, tar@^6.1.11, tar@^6.1.2:
+tar@^6.0.2, tar@^6.1.0, tar@^6.1.2:
   version "6.2.1"
   resolved "https://registry.npmjs.org/tar/-/tar-6.2.1.tgz"
   integrity sha512-DZ4yORTwrbTj/7MZYq2w+/ZFdI6OZ/f9SFHR+71gIVUZhOQPHzVCLpvRnPgyaMpfWxxk/4ONva3GQSyNIKRv6A==
@@ -10047,11 +10003,6 @@ unbox-primitive@^1.0.2:
     has-bigints "^1.0.2"
     has-symbols "^1.0.3"
     which-boxed-primitive "^1.0.2"
-
-undici-types@~5.26.4:
-  version "5.26.5"
-  resolved "https://registry.npmjs.org/undici-types/-/undici-types-5.26.5.tgz"
-  integrity sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==
 
 undici-types@~6.19.2:
   version "6.19.8"
