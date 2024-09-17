@@ -22,7 +22,7 @@ yarn build && ./bin/run start --config config/custom_config.json --overwrite-con
 ### Get token balances
 
 ```
-./bin/run endpoint:invoke token_getBalances '{"address":"kly4mba244me87reyg9fegcy2cesdfw6gq9r8we5x"}' --pretty
+./bin/run endpoint:invoke token_getBalances '{"address":"klyznbosu8hm57dgosc5a5ozg9pcbd3natw4jb4t8"}' --pretty
 ```
 
 ### Add a new module

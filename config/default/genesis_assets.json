@@ -7,20 +7,20 @@
 					{
 						"address": "klyznbosu8hm57dgosc5a5ozg9pcbd3natw4jb4t8",
 						"tokenID": "0137133700000000",
-						"availableBalance": "100000000000000",
+						"availableBalance": "10000000000000000",
 						"lockedBalances": []
 					},
 					{
 						"address": "klyzywapkwwftkpwua4yatw8d7ovnwytfqbpv7xmr",
 						"tokenID": "0137133700000000",
-						"availableBalance": "100000000000000",
+						"availableBalance": "10000000000000000",
 						"lockedBalances": []
 					}
 				],
 				"supplySubstore": [
 					{
 						"tokenID": "0137133700000000",
-						"totalSupply": "200000000000000"
+						"totalSupply": "20000000000000000"
 					}
 				],
 				"escrowSubstore": [],

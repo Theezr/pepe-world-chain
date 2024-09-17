@@ -73,7 +73,7 @@ import { apiClient } from 'klayr-sdk';
 			transactionId: string;
 		}>('chainConnector_authorize', {
 			enable: true,
-			password: 'TestTest!23',
+			password: 'klayr',
 		});
 		console.log('Authorize Sidechain completed, result:', authorizeSideChainResult);
 	}
