@@ -11,14 +11,14 @@ import { apiClient } from 'klayr-sdk';
 	const MAINCHAIN_ARRAY = ['klayr-core'];
 	let i = 0;
 	for (const nodeAlias of SIDECHAIN_ARRAY) {
-		const sidechainClient = await apiClient.createWSClient(`wss://token-factory.klayr.dev/rpc-ws`);
+		const sidechainClient = await apiClient.createWSClient(`wss://pepe-chain.klayr.dev/rpc-ws`);
 		const sidechainNodeInfo = await sidechainClient.invoke('system_getNodeInfo');
-		console.log({ sidechainNodeInfo });
+		// console.log({ sidechainNodeInfo });
 
-		const mainchainClient = await apiClient.createWSClient(`wss://testnet.klayr.xyz/rpc-ws`);
+		const mainchainClient = await apiClient.createWSClient(`wss://pepe-core.klayr.dev/rpc-ws`);
 		// const testClient = await apiClient.createWSClient(`wss://pepe-core.klayr.dev/rpc-ws`);
-		// const testNodeInfo = await testClient.invoke('system_getNodeInfo');
-		// console.log({ testNodeInfo });
+		// const mainchainInfo = await mainchainClient.invoke('system_getNodeInfo');
+		// console.log({ mainchainInfo });
 		// return;
 
 		// Get info about the active sidechain validators and the certificate threshold
