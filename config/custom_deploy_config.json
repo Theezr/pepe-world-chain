@@ -43,7 +43,7 @@
 	},
 	"modules": {
 		"fee": {
-			"feeTokenID": "0100000000000000",
+			"feeTokenID": "0137133700000000",
 			"maxBlockHeightZeroFeePerByte": 1000,
 			"feePoolAddress": "klyntmfeh77r3d86yv27vgx8shm7wouvhwcba6864"
 		}
