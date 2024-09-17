@@ -11,7 +11,7 @@ import { apiClient } from 'klayr-sdk';
 	const MAINCHAIN_ARRAY = ['klayr-core'];
 	let i = 0;
 	for (const nodeAlias of SIDECHAIN_ARRAY) {
-		const sidechainClient = await apiClient.createWSClient(`wss://pepe-core.klayr.dev/rpc-ws`);
+		const sidechainClient = await apiClient.createWSClient(`wss://token-factory.klayr.dev/rpc-ws`);
 		const sidechainNodeInfo = await sidechainClient.invoke('system_getNodeInfo');
 		console.log({ sidechainNodeInfo });
 
@@ -44,7 +44,10 @@ import { apiClient } from 'klayr-sdk';
 			},
 		};
 
-		const signedTransaction = await mainchainClient.transaction.create(unsignedTransaction, 'b');
+		const signedTransaction = await mainchainClient.transaction.create(
+			unsignedTransaction,
+			'b05af5911327605923026c624acc4ff24e02e927e05e2624c88f840f0017589a907ccfbe8412c529cd826cb08b1ea1475d8e923a55168abf9b9a55548b6deb8b',
+		);
 
 		try {
 			const receipt = await mainchainClient.transaction.send(signedTransaction);
@@ -70,7 +73,7 @@ import { apiClient } from 'klayr-sdk';
 			transactionId: string;
 		}>('chainConnector_authorize', {
 			enable: true,
-			password: 'klayr',
+			password: 'TestTest!23',
 		});
 		console.log('Authorize Sidechain completed, result:', authorizeSideChainResult);
 	}

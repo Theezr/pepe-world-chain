@@ -1,13 +1,17 @@
 {
 	"system": {
 		"dataPath": "~/.klayr/pepe-world",
-		"keepEventsForHeights": 300,
-		"logLevel": "info"
+		"logLevel": "info",
+		"keepEventsForHeights": -1,
+		"keepInclusionProofsForHeights": -1,
+		"inclusionProofKeys": [
+			"83ed0d2500007770abbb9381f8649485dc1b54638f0fe98e10d3bd560820ba1d08fa499dc0fb"
+		]
 	},
 	"rpc": {
 		"modes": ["ipc", "ws", "http"],
 		"port": 7887,
-		"host": "127.0.0.1",
+		"host": "0.0.0.0",
 		"allowedMethods": ["*"],
 		"accessControlAllowOrigin": "*"
 	},
@@ -37,17 +41,23 @@
 			"fromFile": "./config/dev-validators.json"
 		}
 	},
-	"modules": {},
+	"modules": {
+		"fee": {
+			"feeTokenID": "0100000000000000",
+			"maxBlockHeightZeroFeePerByte": 1000,
+			"feePoolAddress": "klyntmfeh77r3d86yv27vgx8shm7wouvhwcba6864"
+		}
+	},
 	"plugins": {
 		"chainConnector": {
-			"registrationHeight": 100,
+			"registrationHeight": 1000,
 			"receivingChainWsURL": "wss://pepe-core.klayr.dev/rpc-ws",
 			"receivingChainID": "01000000",
 			"encryptedPrivateKey": "kdf=argon2id&cipher=aes-128-gcm&version=1&ciphertext=fb1c27a4ded49a9ae369bc17da15c06312d24963ae9f7ccef4cc5b67788fe9fd1178d1364d14ec547aa0abf107a4bc232eed9b848b028d16e1a5bd0022489164957bcff7301d86083b869a5489b8f81b41a1ade860664578c021c1eb682628935b37d55412b5f261d272b5f83a3091b2857db2b9452d5305de74a31f7a0528f4acb7de2b5bcf5bae483e596de6307c9a41b9b05dc20c765195cb0a4ce8e8ad9a64bcf688c49f079009bfaf60d24c9940715fe0592d05de0c9599292341d5baf2af5f0035e7be35009fab95737fcc60a07ddb1d40ad4ed614c71a4751d5bbfb325a0ec5faf2e1302c3ad6a0731de1ce4dc4&mac=eca5d78f225d5b50c0162ad172eac3f3e59583e9bcfa5bb11edd5eba522745aa&salt=b9a052dbf90c2b2a&iv=a3e6cd2659c7927ef8cd83693c611c09&tag=f937ca84c678e09eff90c2e4dfcd7745&iterations=3&parallelism=4&memorySize=65536"
 		},
 		"drip": {
 			"tokenID": "0137133700000000",
-			"host": "127.0.0.1",
+			"host": "0.0.0.0",
 			"port": 4004,
 			"encryptedPrivateKey": "kdf=argon2id&cipher=aes-128-gcm&version=1&ciphertext=797d5c1523c22c91ff8b62d2bb5348a04508874b35980b7dfd3a0e21d07a9ec388d6c0eb20a674c6f1d55dfc9a17ba8b0f3b8aa9a8ae82127a5277cd680f9822acd6b0bcba8dc2bee5b4b32488da0ae91cfe8c80f27501a9a7ad4e29f337be6526282fb79b811ca4286278d316ba3538586163632c9b1cabe7c6d3fa49806254&mac=f9dbf15f9c12e276fe988ac595af873d78993153d18314a34e25a5a73233565c&salt=04ec0df2aac284ff&iv=511c4c1402bc62d1bf32d165da53a17b&tag=f511be4b3b6510d26d3bb7ad43cab301&iterations=1&parallelism=4&memorySize=2097023"
 		}
