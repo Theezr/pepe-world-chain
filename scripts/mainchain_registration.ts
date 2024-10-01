@@ -27,19 +27,18 @@ import { keys as sidechainDevValidators } from '../default/dev-validators.json';
  * Includes all keys of the sidechain validators to create the aggregated signature.
  */
 
-
-
 export const registerMainchain = async (_mc: string, sc: string, sidechainDevValidators: any[]) => {
 	const { bls, address } = cryptography;
 	const mainchainClient = await apiClient.createWSClient(`wss://pepe-core.klayr.dev/rpc-ws`);
-	const sidechainClient = await apiClient.createWSClient(`wss://token-factory.klayr.dev/rpc-ws`);
-  
+	const sidechainClient = await apiClient.createWSClient(`wss://pepe-chain.klayr.dev/rpc-ws`);
+
 	const mainchainNodeInfo = await mainchainClient.invoke('system_getNodeInfo');
 	const sidechainNodeInfo = await sidechainClient.invoke('system_getNodeInfo');
 	// Get node info from sidechain and mainchain
 
-  console.log('mainchainNodeInfo:', mainchainNodeInfo);
-  // return
+	console.log('mainchainNodeInfo:', mainchainNodeInfo);
+	console.log('sidechainNodeInfo:', sidechainNodeInfo);
+	// return
 	// Get active validators from mainchain
 	const {
 		validators: mainchainActiveValidators,
@@ -48,15 +47,15 @@ export const registerMainchain = async (_mc: string, sc: string, sidechainDevVal
 		height: mainchainNodeInfo.height,
 	});
 
-  const paramsJSON = {
-    ownChainID: sidechainNodeInfo.chainID,
-    ownName: sc.replace(/-/g, '_'),
-    mainchainValidators: (mainchainActiveValidators as { blsKey: string; bftWeight: string }[])
-      .map(v => ({blsKey: v.blsKey, bftWeight: v.bftWeight}))
-      .filter(v => BigInt(v.bftWeight) > BigInt(0))
-      .sort((a, b) => Buffer.from(a.blsKey, 'hex').compare(Buffer.from(b.blsKey, 'hex'))),
-    mainchainCertificateThreshold: BigInt(mainchainCertificateThreshold as number),
-  };
+	const paramsJSON = {
+		ownChainID: sidechainNodeInfo.chainID,
+		ownName: sc.replace(/-/g, '_'),
+		mainchainValidators: (mainchainActiveValidators as { blsKey: string; bftWeight: string }[])
+			.map(v => ({ blsKey: v.blsKey, bftWeight: v.bftWeight }))
+			.filter(v => BigInt(v.bftWeight) > BigInt(0))
+			.sort((a, b) => Buffer.from(a.blsKey, 'hex').compare(Buffer.from(b.blsKey, 'hex'))),
+		mainchainCertificateThreshold: BigInt(mainchainCertificateThreshold as number),
+	};
 
 	// Define parameters for the mainchain registration
 	const params = {
@@ -127,6 +126,9 @@ export const registerMainchain = async (_mc: string, sc: string, sidechainDevVal
 		address: address.getKlayr32AddressFromPublicKey(Buffer.from(relayerKeyInfo.publicKey, 'hex')),
 	});
 
+	// console.log('address:', address.getKlayr32AddressFromPublicKey(Buffer.from(relayerKeyInfo.publicKey, 'hex')));
+	// return;
+
 	// Add aggregated signature to the parameters of the mainchain registration
 	const mainchainRegParams = {
 		...paramsJSON,
@@ -150,8 +152,8 @@ export const registerMainchain = async (_mc: string, sc: string, sidechainDevVal
 		Buffer.from(sidechainNodeInfo.chainID as string, 'hex'),
 		Buffer.from(relayerKeyInfo.privateKey, 'hex'),
 	);
-  console.log(relayerKeyInfo.privateKey);
-  // return
+
+	// return
 
 	// Post the transaction to a sidechain node
 	const result = await sidechainClient.invoke<{
@@ -174,5 +176,5 @@ export const registerMainchain = async (_mc: string, sc: string, sidechainDevVal
 };
 
 (async () => {
-  await registerMainchain("klayr-core","pepe-world",sidechainDevValidators);
+	await registerMainchain('klayr-core', 'pepe-world', sidechainDevValidators);
 })();
