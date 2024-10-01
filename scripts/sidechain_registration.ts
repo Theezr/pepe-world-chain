@@ -13,13 +13,18 @@ import { apiClient } from 'klayr-sdk';
 	for (const nodeAlias of SIDECHAIN_ARRAY) {
 		const sidechainClient = await apiClient.createWSClient(`wss://pepe-chain.klayr.dev/rpc-ws`);
 		const sidechainNodeInfo = await sidechainClient.invoke('system_getNodeInfo');
-		// console.log({ sidechainNodeInfo });
+		console.log({ sidechainNodeInfo });
 
 		const mainchainClient = await apiClient.createWSClient(`wss://pepe-core.klayr.dev/rpc-ws`);
 		// const testClient = await apiClient.createWSClient(`wss://pepe-core.klayr.dev/rpc-ws`);
 		// const mainchainInfo = await mainchainClient.invoke('system_getNodeInfo');
 		// console.log({ mainchainInfo });
-		// return;
+
+		const test = await sidechainClient.invoke<{
+			transactionId: string;
+		}>('chain_getInclusionProofsAtHeight', {});
+		console.log('Authorize Sidechain completed, result:', test);
+		return;
 
 		// Get info about the active sidechain validators and the certificate threshold
 		const { validators: sidechainActiveValidators, certificateThreshold } =

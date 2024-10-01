@@ -50,7 +50,7 @@
 	},
 	"plugins": {
 		"chainConnector": {
-			"registrationHeight": 1000,
+			"registrationHeight": 302400,
 			"receivingChainWsURL": "wss://pepe-core.klayr.dev/rpc-ws",
 			"receivingChainID": "01000000",
 			"encryptedPrivateKey": "kdf=argon2id&cipher=aes-128-gcm&version=1&ciphertext=d8461cd33daa412caababee5953da518f098142b0e69292f621743365822f666e66c63a54d9bf283928ae3092bf93c5423f5f674898dd8bb84f9607eb5514f04ba9bd7ba2287f5a192cd8232c940298bedbe32385fc0396873c11f54ad798b07ae0a241538ab04cab03d3543a4fd3346145a7e60af93b3fe2d2872023b10c003&mac=1e6f53ebecfc2dddb138d007df3de9b555de93838145a7590b865a4a1c0a19de&salt=1e34eb6c70284a45&iv=61e5f9f082e05e7bcaf912b3f47eec9c&tag=360504d48367ffaf4c942542598bd485&iterations=1&parallelism=4&memorySize=2097023"
