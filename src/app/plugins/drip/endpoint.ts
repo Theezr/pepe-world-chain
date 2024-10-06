@@ -24,8 +24,13 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 	private _state: State = { publicKey: undefined, privateKey: undefined, address: undefined };
 	private _client!: Plugins.BasePlugin['apiClient'];
 	private _config!: DripPluginConfig;
+	private nonce: string = '';
 
-	public init(state: State, apiClient: Plugins.BasePlugin['apiClient'], config: DripPluginConfig) {
+	public async init(
+		state: State,
+		apiClient: Plugins.BasePlugin['apiClient'],
+		config: DripPluginConfig,
+	) {
 		this._state = state;
 		this._client = apiClient;
 		this._config = config;
@@ -62,9 +67,12 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 				senderPublicKey: this._state.publicKey?.toString('hex'),
 				fee: transactions.convertklyToBeddows(this._config.fee), // TODO: The static fee should be replaced by fee estimation calculation
 				params: transferTransactionParams,
+				nonce: this.nonce,
 			},
 			this._state.privateKey?.toString('hex') as string,
 		);
+
+		this.nonce = (parseInt(this.nonce) + 1).toString();
 
 		await this._client.transaction.send(transaction);
 	}
@@ -97,6 +105,13 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 				? cryptography.address.getKlayr32AddressFromPublicKey(publicKey, this._config.tokenPrefix)
 				: undefined;
 			const changedState = enable ? 'enabled' : 'disabled';
+
+			const account = await this._client.invoke('auth_getAuthAccount', {
+				address: this._state.address,
+			});
+
+			console.log('nonce:', account);
+			this.nonce = account.nonce as string;
 
 			return {
 				result: `Successfully ${changedState} the dripper.`,

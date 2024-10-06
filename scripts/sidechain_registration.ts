@@ -21,11 +21,11 @@ import { apiClient } from 'klayr-sdk';
 		// const mainchainInfo = await mainchainClient.invoke('system_getNodeInfo');
 		// console.log({ mainchainInfo });
 
-		// const test = await localNode.invoke<{
-		// 	transactionId: string;
-		// }>('chain_getInclusionProofsAtHeight', {});
-		// console.log('result:', test);
-		// return;
+		const test = await sidechainClient.invoke<{
+			transactionId: string;
+		}>('chain_getInclusionProofsAtHeight', {});
+		console.log('result:', test);
+		return;
 
 		// Get info about the active sidechain validators and the certificate threshold
 		const { validators: sidechainActiveValidators, certificateThreshold } =
