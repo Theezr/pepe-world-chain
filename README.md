@@ -9,10 +9,22 @@ This project was bootstrapped with [Klayr SDK](https://github.com/Klayrhq/klayr-
 yarn build && ./bin/run start --config config/custom_config.json --overwrite-config
 ```
 
+### Mint module
+
+```
+ ./bin/run transaction:create mint baseMint 10000000 --params='{"amount": "100000000", "recipient": "kly4mba244me87reyg9fegcy2cesdfw6gq9r8we5x"}' --json --pretty
+```
+
+### nft
+
+```
+ ./bin/run transaction:create mint createNft 10000000 --params='{"amount": "100000000", "recipient": "kly4mba244me87reyg9fegcy2cesdfw6gq9r8we5x"}' --json --pretty
+```
+
 ### Drip Plugin
 
 ```
-./bin/run endpoint:invoke drip_fundTokens '{"address": "kly4mba244me87reyg9fegcy2cesdfw6gq9r8we5x"}' --pretty
+./bin/run endpoint:invoke drip_fundTokens '{"address": "klyopmzg5g2dem64amsdfy32m86krd8y5p56nd6b9"}' --pretty
 ```
 
 ```
@@ -22,7 +34,13 @@ yarn build && ./bin/run start --config config/custom_config.json --overwrite-con
 ### Get token balances
 
 ```
-./bin/run endpoint:invoke token_getBalances '{"address":"klyznbosu8hm57dgosc5a5ozg9pcbd3natw4jb4t8"}' --pretty
+./bin/run endpoint:invoke token_getBalances '{"address":"klyopmzg5g2dem64amsdfy32m86krd8y5p56nd6b9"}' --pretty
+```
+
+### Get nft balances
+
+```
+./bin/run endpoint:invoke nft_getNFTs '{"address":"klyopmzg5g2dem64amsdfy32m86krd8y5p56nd6b9"}' --pretty
 ```
 
 ### Add a new module

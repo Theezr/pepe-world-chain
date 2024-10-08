@@ -15,6 +15,8 @@
 import { Plugins, Types, cryptography, validator as klayrvalidator, transactions } from 'klayr-sdk';
 import { authorizeParamsSchema, fundParamsSchema } from './schemas';
 import { DripPluginConfig, State } from './types';
+import { LENGTH_COLLECTION_ID } from 'klayr-framework/dist-node/modules/nft/constants';
+import { utils } from '@klayr/cryptography';
 
 // disabled for type annotation
 // eslint-disable-next-line prefer-destructuring
@@ -26,11 +28,7 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 	private _config!: DripPluginConfig;
 	private nonce: string = '';
 
-	public async init(
-		state: State,
-		apiClient: Plugins.BasePlugin['apiClient'],
-		config: DripPluginConfig,
-	) {
+	public init(state: State, apiClient: Plugins.BasePlugin['apiClient'], config: DripPluginConfig) {
 		this._state = state;
 		this._client = apiClient;
 		this._config = config;
@@ -48,24 +46,47 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 		await this._transferFunds(address as string);
 
 		return {
-			result: `Successfully funded account at address: ${address as string}.`,
+			result: `Successfully funded account at address: ${address as string}`,
 		};
 	}
 
 	private async _transferFunds(address: string): Promise<void> {
+		// const transferTransactionParams = {
+		// 	tokenID: this._config.tokenID,
+		// 	amount: transactions.convertklyToBeddows(this._config.amount),
+		// 	recipientAddress: address,
+		// 	data: '',
+		// };
+
+		// const firstIndex = Buffer.alloc(LENGTH_NFT_ID - LENGTH_CHAIN_ID - LENGTH_COLLECTION_ID, 0);
+		// firstIndex.writeBigUInt64BE(BigInt(0));
+		// const nftID = Buffer.concat([
+		// 	Buffer.from('01371337'),
+		// 	utils.getRandomBytes(LENGTH_CHAIN_ID),
+		// 	firstIndex,
+		// ]);
+
 		const transferTransactionParams = {
-			tokenID: this._config.tokenID,
-			amount: transactions.convertklyToBeddows(this._config.amount),
-			recipientAddress: address,
-			data: '',
+			// tokenID: this._config.tokenID,
+			// amount: transactions.convertklyToBeddows(this._config.amount),
+			address: address,
+			collectionID: utils.getRandomBytes(LENGTH_COLLECTION_ID),
+			attributesArray: [
+				{
+					module: 'mint',
+					attributes: Buffer.from('0x01'),
+				},
+			],
 		};
+
+		console.log('transferTransactionParams:', transferTransactionParams);
 
 		const transaction = await this._client.transaction.create(
 			{
-				module: 'token',
-				command: 'transfer',
+				module: 'mint',
+				command: 'createNft',
 				senderPublicKey: this._state.publicKey?.toString('hex'),
-				fee: transactions.convertklyToBeddows(this._config.fee), // TODO: The static fee should be replaced by fee estimation calculation
+				fee: transactions.convertklyToBeddows(this._config.fee),
 				params: transferTransactionParams,
 				nonce: this.nonce,
 			},
