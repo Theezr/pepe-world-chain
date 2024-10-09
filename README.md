@@ -21,6 +21,12 @@ yarn build && ./bin/run start --config config/custom_config.json --overwrite-con
  ./bin/run transaction:create mint createNft 10000000 --params='{"amount": "100000000", "recipient": "kly4mba244me87reyg9fegcy2cesdfw6gq9r8we5x"}' --json --pretty
 ```
 
+### Upgrade nft
+
+```
+ ./bin/run transaction:create mint upgradeNft 10000000 --params='{"module": "mint", "nftID": "013713377c7c7e160000000000000000", attri}' --json --pretty
+```
+
 ### Drip Plugin
 
 ```
@@ -40,7 +46,7 @@ yarn build && ./bin/run start --config config/custom_config.json --overwrite-con
 ### Get nft balances
 
 ```
-./bin/run endpoint:invoke nft_getNFTs '{"address":"klyopmzg5g2dem64amsdfy32m86krd8y5p56nd6b9"}' --pretty
+./bin/run endpoint:invoke nft_getNFTs '{"address":"kly4mba244me87reyg9fegcy2cesdfw6gq9r8we5x"}' --pretty
 ```
 
 ### Add a new module

@@ -73,3 +73,26 @@ export const mintNftParamsSchema = {
 		},
 	},
 };
+
+export const upgradeNftParamsSchema = {
+	$id: '/klayr/upgradeNftParams',
+	type: 'object',
+	required: ['nftID', 'module', 'attributes'],
+	properties: {
+		nftID: {
+			dataType: 'bytes',
+			fieldNumber: 1,
+		},
+		module: {
+			dataType: 'string',
+			minLength: MIN_LENGTH_MODULE_NAME,
+			maxLength: MAX_LENGTH_MODULE_NAME,
+			pattern: '^[a-zA-Z0-9]*$',
+			fieldNumber: 2,
+		},
+		attributes: {
+			dataType: 'bytes',
+			fieldNumber: 3,
+		},
+	},
+};

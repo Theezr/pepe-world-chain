@@ -1,20 +1,22 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable @typescript-eslint/member-ordering */
+import { NFTMethod } from 'klayr-framework/dist-node/modules/nft/method';
 import { TokenMethod } from 'klayr-framework/dist-node/modules/token';
 import { Modules } from 'klayr-sdk';
 import { BaseMintCommand } from './commands/base_mint_command';
 import { CreateNftCommand } from './commands/create_nft_command';
+import { UpgradeNftCommand } from './commands/upgrade_nft_command';
 import { MintEndpoint } from './endpoint';
 import { MintMethod } from './method';
-import { NFTMethod } from 'klayr-framework/dist-node/modules/nft/method';
 
 export class MintModule extends Modules.BaseModule {
 	public endpoint = new MintEndpoint(this.stores, this.offchainStores);
 	public method = new MintMethod(this.stores, this.events);
 	public _baseMintCommand = new BaseMintCommand(this.stores, this.events);
 	public _createNftCommand = new CreateNftCommand(this.stores, this.events);
+	public _upgradeNftCommand = new UpgradeNftCommand(this.stores, this.events);
 
-	public commands = [this._baseMintCommand, this._createNftCommand];
+	public commands = [this._baseMintCommand, this._createNftCommand, this._upgradeNftCommand];
 
 	public _tokenMethod!: TokenMethod;
 	public _nftMethod!: NFTMethod;
@@ -33,6 +35,10 @@ export class MintModule extends Modules.BaseModule {
 		});
 
 		this._createNftCommand.addDependencies({
+			nftMethod: this._nftMethod,
+		});
+
+		this._upgradeNftCommand.addDependencies({
 			nftMethod: this._nftMethod,
 		});
 	}

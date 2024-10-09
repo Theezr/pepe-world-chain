@@ -66,7 +66,7 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 		// 	firstIndex,
 		// ]);
 
-		const transferTransactionParams = {
+		const mintNft = {
 			// tokenID: this._config.tokenID,
 			// amount: transactions.convertklyToBeddows(this._config.amount),
 			address: address,
@@ -79,15 +79,21 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 			],
 		};
 
-		console.log('transferTransactionParams:', transferTransactionParams);
+		const upgradeNft = {
+			nftID: '01371337e7197bfc0000000000000000',
+			module: 'mint',
+			attributes: Buffer.from('22'),
+		};
+
+		console.log('transferTransactionParams:', upgradeNft, mintNft);
 
 		const transaction = await this._client.transaction.create(
 			{
 				module: 'mint',
-				command: 'createNft',
+				command: 'upgradeNft',
 				senderPublicKey: this._state.publicKey?.toString('hex'),
 				fee: transactions.convertklyToBeddows(this._config.fee),
-				params: transferTransactionParams,
+				params: upgradeNft,
 				nonce: this.nonce,
 			},
 			this._state.privateKey?.toString('hex') as string,
