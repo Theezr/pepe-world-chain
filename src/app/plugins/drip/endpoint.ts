@@ -13,7 +13,7 @@
  */
 
 import { Plugins, Types, cryptography, validator as klayrvalidator, transactions } from 'klayr-sdk';
-import { authorizeParamsSchema, fundParamsSchema } from './schemas';
+import { authorizeParamsSchema, fundParamsSchema, getNftsParamsSchema } from './schemas';
 import { DripPluginConfig, State } from './types';
 import { LENGTH_COLLECTION_ID } from 'klayr-framework/dist-node/modules/nft/constants';
 import { utils } from '@klayr/cryptography';
@@ -51,20 +51,12 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 	}
 
 	private async _transferFunds(address: string): Promise<void> {
-		// const transferTransactionParams = {
+		// const mintParams = {
 		// 	tokenID: this._config.tokenID,
-		// 	amount: transactions.convertklyToBeddows(this._config.amount),
-		// 	recipientAddress: address,
+		// 	amount: '1',
+		// 	recipient: address,
 		// 	data: '',
 		// };
-
-		// const firstIndex = Buffer.alloc(LENGTH_NFT_ID - LENGTH_CHAIN_ID - LENGTH_COLLECTION_ID, 0);
-		// firstIndex.writeBigUInt64BE(BigInt(0));
-		// const nftID = Buffer.concat([
-		// 	Buffer.from('01371337'),
-		// 	utils.getRandomBytes(LENGTH_CHAIN_ID),
-		// 	firstIndex,
-		// ]);
 
 		const mintNft = {
 			// tokenID: this._config.tokenID,
@@ -74,26 +66,32 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 			attributesArray: [
 				{
 					module: 'mint',
-					attributes: Buffer.from('0x01'),
+					attributes: Buffer.from(
+						JSON.stringify({
+							level: 2,
+							txpersec: 10,
+							etc: 'heelTest2',
+						}),
+					),
 				},
 			],
 		};
 
-		const upgradeNft = {
-			nftID: '01371337e7197bfc0000000000000000',
-			module: 'mint',
-			attributes: Buffer.from('22'),
-		};
+		// const upgradeNft = {
+		// 	nftID: '01371337e7197bfc0000000000000000',
+		// 	module: 'mint',
+		// 	attributes: Buffer.from('22'),
+		// };
 
-		console.log('transferTransactionParams:', upgradeNft, mintNft);
+		console.log('transferTransactionParams:', mintNft);
 
 		const transaction = await this._client.transaction.create(
 			{
 				module: 'mint',
-				command: 'upgradeNft',
+				command: 'createNft',
 				senderPublicKey: this._state.publicKey?.toString('hex'),
 				fee: transactions.convertklyToBeddows(this._config.fee),
-				params: upgradeNft,
+				params: mintNft,
 				nonce: this.nonce,
 			},
 			this._state.privateKey?.toString('hex') as string,
@@ -103,6 +101,97 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 
 		await this._client.transaction.send(transaction);
 	}
+
+	public async mintDustGeneratorNft(
+		context: Types.PluginEndpointContext,
+	): Promise<{ result: any }> {
+		validator.validate(getNftsParamsSchema, context.params);
+		const { address } = context.params;
+
+		// CHECK IF ACCOUNT ALREADY HAS DUST GENRRATOR NEFT
+
+		if (!this._state.publicKey || !this._state.privateKey) {
+			throw new Error('Faucet is not enabled.');
+		}
+		const FIXED_COLLECTION_ID = '01234567';
+
+		const mintNft = {
+			address: address,
+			collectionID: FIXED_COLLECTION_ID,
+			attributesArray: [
+				{
+					module: 'stats',
+					attributes: Buffer.from(
+						JSON.stringify({
+							dustPerSecond: 20,
+							multiplier: 1,
+							dustCap: 300,
+							level: 2,
+							rarity: 'common',
+						}),
+					),
+				},
+			],
+		};
+
+		const transaction = await this._client.transaction.create(
+			{
+				module: 'mint',
+				command: 'createNft',
+				senderPublicKey: this._state.publicKey?.toString('hex'),
+				fee: transactions.convertklyToBeddows(this._config.fee),
+				params: mintNft,
+				nonce: this.nonce,
+			},
+			this._state.privateKey?.toString('hex') as string,
+		);
+
+		this.nonce = (parseInt(this.nonce) + 1).toString();
+		await this._client.transaction.send(transaction);
+
+		return {
+			result: `Successfully funded account at address: ${address as string}`,
+		};
+	}
+
+	public async getNftsForAddress(context: Types.PluginEndpointContext): Promise<{ nfts: any }> {
+		validator.validate(getNftsParamsSchema, context.params);
+		const { address } = context.params;
+
+		const nfts = await this._client.invoke('nft_getNFTs', {
+			address,
+		});
+		const nftArray = nfts.nfts as any[];
+
+		const decodedNfts = nftArray.map(nft => {
+			const decodedAttributesArray = nft.attributesArray.map(attribute => {
+				return {
+					...attribute,
+					attributes: this._decodeAttributes(attribute.attributes),
+				};
+			});
+
+			return {
+				...nft,
+				attributesArray: decodedAttributesArray,
+			};
+		});
+
+		console.log(decodedNfts);
+
+		return {
+			nfts: decodedNfts,
+		};
+	}
+
+	private _decodeAttributes = (hexString: string) => {
+		if (!hexString) return {};
+
+		const buffer = Buffer.from(hexString, 'hex');
+		const jsonString = buffer.toString('utf8');
+		const attributes = JSON.parse(jsonString);
+		return attributes;
+	};
 
 	public async authorize(context: Types.PluginEndpointContext): Promise<{ result: string }> {
 		validator.validate<{ enable: boolean; password: string }>(

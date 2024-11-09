@@ -31,7 +31,7 @@
 		"block": {
 			"fromFile": "./config/genesis_block.blob"
 		},
-		"blockTime": 4,
+		"blockTime": 5,
 		"bftBatchSize": 103,
 		"maxTransactionsSize": 15360,
 		"chainID": "01371337"
@@ -50,7 +50,7 @@
 	},
 	"plugins": {
 		"drip": {
-			"tokenID": "0137133700000010",
+			"tokenID": "0137133700000000",
 			"host": "0.0.0.0",
 			"port": 4004,
 			"encryptedPrivateKey": "kdf=argon2id&cipher=aes-128-gcm&version=1&ciphertext=797d5c1523c22c91ff8b62d2bb5348a04508874b35980b7dfd3a0e21d07a9ec388d6c0eb20a674c6f1d55dfc9a17ba8b0f3b8aa9a8ae82127a5277cd680f9822acd6b0bcba8dc2bee5b4b32488da0ae91cfe8c80f27501a9a7ad4e29f337be6526282fb79b811ca4286278d316ba3538586163632c9b1cabe7c6d3fa49806254&mac=f9dbf15f9c12e276fe988ac595af873d78993153d18314a34e25a5a73233565c&salt=04ec0df2aac284ff&iv=511c4c1402bc62d1bf32d165da53a17b&tag=f511be4b3b6510d26d3bb7ad43cab301&iterations=1&parallelism=4&memorySize=2097023"

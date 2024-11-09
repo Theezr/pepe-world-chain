@@ -35,7 +35,7 @@ export class BaseMintCommand extends Modules.BaseCommand {
 		console.log('executing mint command');
 		console.log({ recipient, amount, tokenID });
 
-		await this._tokenMethod.initializeToken(context.getMethodContext(), Buffer.from(tokenID));
+		// await this._tokenMethod.initializeToken(context.getMethodContext(), Buffer.from(tokenID));
 		await this._tokenMethod.mint(
 			context.getMethodContext(),
 			Buffer.from(recipient),

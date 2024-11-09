@@ -30,7 +30,9 @@ yarn build && ./bin/run start --config config/custom_config.json --overwrite-con
 ### Drip Plugin
 
 ```
-./bin/run endpoint:invoke drip_fundTokens '{"address": "klyopmzg5g2dem64amsdfy32m86krd8y5p56nd6b9"}' --pretty
+./bin/run endpoint:invoke drip_fundTokens '{"address": "klyzrja9we9f2hvtc6uoxtbwutb9b8cqmde8vnfro"}' --pretty
+
+./bin/run endpoint:invoke drip_mintDustGeneratorNft '{"address": "kly3ynkdj3dauwkydhc9qsvybathsv2wwvmnoxcw7"}' --pretty
 ```
 
 ```
@@ -41,6 +43,12 @@ yarn build && ./bin/run start --config config/custom_config.json --overwrite-con
 
 ```
 ./bin/run endpoint:invoke token_getBalances '{"address":"klyopmzg5g2dem64amsdfy32m86krd8y5p56nd6b9"}' --pretty
+```
+
+```
+./bin/run endpoint:invoke token_getBalance '{"tokenID": "0137133700000000", "address":"klyopmzg5g2dem64amsdfy32m86krd8y5p56nd6b9"}' --pretty
+
+./bin/run endpoint:invoke drip_getNftsForAddress '{"address": "klyzrja9we9f2hvtc6uoxtbwutb9b8cqmde8vnfro"}' --pretty
 ```
 
 ### Get nft balances
