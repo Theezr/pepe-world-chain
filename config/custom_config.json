@@ -31,7 +31,7 @@
 		"block": {
 			"fromFile": "./config/genesis_block.blob"
 		},
-		"blockTime": 4,
+		"blockTime": 5,
 		"bftBatchSize": 103,
 		"maxTransactionsSize": 15360,
 		"chainID": "01371337"
@@ -49,12 +49,6 @@
 		}
 	},
 	"plugins": {
-		"chainConnector": {
-			"registrationHeight": 1000,
-			"receivingChainWsURL": "wss://pepe-core.klayr.dev/rpc-ws",
-			"receivingChainID": "01000000",
-			"encryptedPrivateKey": "kdf=argon2id&cipher=aes-128-gcm&version=1&ciphertext=fb1c27a4ded49a9ae369bc17da15c06312d24963ae9f7ccef4cc5b67788fe9fd1178d1364d14ec547aa0abf107a4bc232eed9b848b028d16e1a5bd0022489164957bcff7301d86083b869a5489b8f81b41a1ade860664578c021c1eb682628935b37d55412b5f261d272b5f83a3091b2857db2b9452d5305de74a31f7a0528f4acb7de2b5bcf5bae483e596de6307c9a41b9b05dc20c765195cb0a4ce8e8ad9a64bcf688c49f079009bfaf60d24c9940715fe0592d05de0c9599292341d5baf2af5f0035e7be35009fab95737fcc60a07ddb1d40ad4ed614c71a4751d5bbfb325a0ec5faf2e1302c3ad6a0731de1ce4dc4&mac=eca5d78f225d5b50c0162ad172eac3f3e59583e9bcfa5bb11edd5eba522745aa&salt=b9a052dbf90c2b2a&iv=a3e6cd2659c7927ef8cd83693c611c09&tag=f937ca84c678e09eff90c2e4dfcd7745&iterations=3&parallelism=4&memorySize=65536"
-		},
 		"drip": {
 			"tokenID": "0137133700000000",
 			"host": "0.0.0.0",

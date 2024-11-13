@@ -75,6 +75,18 @@ export const fundParamsSchema = {
 	},
 };
 
+export const getNftsParamsSchema = {
+	$id: '/klayr/faucet/fund',
+	type: 'object',
+	required: ['address'],
+	properties: {
+		address: {
+			type: 'string',
+			format: 'klayr32',
+		},
+	},
+};
+
 export const authorizeParamsSchema = {
 	$id: '/klayr/faucet/auth',
 	type: 'object',
