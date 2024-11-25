@@ -1,24 +1,26 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable @typescript-eslint/member-ordering */
+import { NFTMethod } from 'klayr-framework/dist-node/modules/nft';
 import { Modules } from 'klayr-sdk';
+import { ClaimRewardsCommand } from './commands/claim_rewards_command';
 import { StakePepeCommand } from './commands/stake_pepe_command';
+import { UnstakePepeCommand } from './commands/unstake_pepe_command';
 import { StakeEndpoint } from './endpoint';
 import { StakeMethod } from './method';
-import { NFTMethod } from 'klayr-framework/dist-node/modules/nft';
 import { StakeTimeStore } from './stores/stakeTime';
-import {
-	getStakerRequestSchema,
-	getStakerResponseSchema,
-} from 'klayr-framework/dist-node/modules/pos/schemas';
 
 export class StakeModule extends Modules.BaseModule {
 	public endpoint = new StakeEndpoint(this.stores, this.offchainStores);
 	public method = new StakeMethod(this.stores, this.events);
 
 	public _stakePepeCommand = new StakePepeCommand(this.stores, this.events);
-	public commands = [this._stakePepeCommand];
+	public _unstakePepeCommand = new UnstakePepeCommand(this.stores, this.events);
+	public _claimRewardsCommand = new ClaimRewardsCommand(this.stores, this.events);
+
+	public commands = [this._stakePepeCommand, this._claimRewardsCommand, this._unstakePepeCommand];
 
 	public _nftMethod!: NFTMethod;
+	public _tokenMethod!: Modules.Token.TokenMethod;
 
 	public constructor() {
 		super();
@@ -26,25 +28,43 @@ export class StakeModule extends Modules.BaseModule {
 		this.stores.register(StakeTimeStore, new StakeTimeStore(this.name, 0));
 	}
 
-	public addDependencies(args: { nftMethod: NFTMethod }): void {
+	public addDependencies(args: {
+		tokenMethod: Modules.Token.TokenMethod;
+		nftMethod: NFTMethod;
+	}): void {
 		this._nftMethod = args.nftMethod;
+		this._tokenMethod = args.tokenMethod;
 
 		this._stakePepeCommand.addDependencies({
 			nftMethod: this._nftMethod,
 		});
 
-		this.endpoint.addDependencies(this._nftMethod);
+		this._unstakePepeCommand.addDependencies({
+			method: this.method,
+			nftMethod: this._nftMethod,
+		});
+
+		this._claimRewardsCommand.addDependencies({
+			method: this.method,
+			nftMethod: this._nftMethod,
+		});
+
+		this.method.addDependencies({
+			tokenMethod: this._tokenMethod,
+			nftMethod: this._nftMethod,
+		});
+		this.endpoint.addDependencies(this.method);
 	}
 
 	public metadata(): Modules.ModuleMetadata {
 		return {
 			...this.baseMetadata(),
 			endpoints: [
-				{
-					name: this.endpoint.getStakeRewards.name,
-					request: getStakerRequestSchema,
-					response: getStakerResponseSchema,
-				},
+				// {
+				// 	name: this.endpoint.getStakeRewards.name,
+				// 	request: getStakerRequestSchema,
+				// 	response: getStakerResponseSchema,
+				// },
 			],
 			assets: [],
 		};

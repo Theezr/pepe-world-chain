@@ -29,7 +29,7 @@ export const registerModules = (app: Application, method: KlayrMethod): void => 
 	nftModule.addDependencies(method.interoperability, method.fee, method.token);
 
 	nftFactoryModule.addDependencies({ nftMethod: nftModule.method });
-	stakeModule.addDependencies({ nftMethod: nftModule.method });
+	stakeModule.addDependencies({ tokenMethod: method.token, nftMethod: nftModule.method });
 
 	app.registerModule(mintModule);
 	app.registerModule(nftModule);

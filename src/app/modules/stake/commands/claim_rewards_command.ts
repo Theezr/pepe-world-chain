@@ -1,19 +1,22 @@
 /* eslint-disable class-methods-use-this */
-import { NFTMethod } from 'klayr-framework/dist-node/modules/nft';
 import { Modules, StateMachine } from 'klayr-sdk';
-import { stakePepeSchema } from '../schemas';
+import { claimRewardsSchema } from '../schemas';
+import { NFTMethod } from 'klayr-framework/dist-node/modules/nft';
+import { StakeMethod } from '../method';
 import { StakeTimeStore } from '../stores/stakeTime';
 
 interface Params {
 	nftID: Buffer;
 }
 
-export class StakePepeCommand extends Modules.BaseCommand {
+export class ClaimRewardsCommand extends Modules.BaseCommand {
+	private _method!: StakeMethod;
 	private _nftMethod!: NFTMethod;
 
-	public schema = stakePepeSchema;
+	public schema = claimRewardsSchema;
 
-	public addDependencies(args: { nftMethod: NFTMethod }) {
+	public addDependencies(args: { method: StakeMethod; nftMethod: NFTMethod }) {
+		this._method = args.method;
 		this._nftMethod = args.nftMethod;
 	}
 
@@ -28,16 +31,16 @@ export class StakePepeCommand extends Modules.BaseCommand {
 			return { status: StateMachine.VerifyStatus.FAIL, error: new Error('NFT not found') };
 		}
 
-		if (nft.owner !== context.transaction.senderAddress) {
-			return {
-				status: StateMachine.VerifyStatus.FAIL,
-				error: new Error('NFT is not owned by sender'),
-			};
-		}
+		// if (nft.owner !== context.transaction.senderAddress) {
+		// 	return {
+		// 		status: StateMachine.VerifyStatus.FAIL,
+		// 		error: new Error('NFT is not owned by sender'),
+		// 	};
+		// }
 
 		const locked = this._nftMethod.isNFTLocked(nft);
-		if (locked) {
-			return { status: StateMachine.VerifyStatus.FAIL, error: new Error('NFT is already staked') };
+		if (!locked) {
+			return { status: StateMachine.VerifyStatus.FAIL, error: new Error('NFT is not staked') };
 		}
 
 		return { status: StateMachine.VerifyStatus.OK };
@@ -45,10 +48,13 @@ export class StakePepeCommand extends Modules.BaseCommand {
 
 	public async execute(context: StateMachine.CommandExecuteContext<Params>): Promise<void> {
 		const { nftID } = context.params;
+		context.logger.info('EXECUTE claimRewards for NFT', nftID.toString());
+		const currentTime = context.header.timestamp;
+
+		const nft = await this._nftMethod.getNFT(context, nftID);
+		await this._method.mintRewardsToUser(context, nftID, currentTime, nft.owner);
 
 		const stakeTimeStore = this.stores.get(StakeTimeStore);
 		await stakeTimeStore.set(context, nftID, { time: context.header.timestamp });
-
-		await this._nftMethod.lock(context, this.name, nftID);
 	}
 }
