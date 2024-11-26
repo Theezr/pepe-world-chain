@@ -49,6 +49,10 @@ export class StakePepeCommand extends Modules.BaseCommand {
 		const stakeTimeStore = this.stores.get(StakeTimeStore);
 		await stakeTimeStore.set(context, nftID, { time: context.header.timestamp });
 
-		await this._nftMethod.lock(context, this.name, nftID);
+		try {
+			await this._nftMethod.lock(context, this.name, nftID);
+		} catch (e) {
+			console.log('error:', e);
+		}
 	}
 }

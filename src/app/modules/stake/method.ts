@@ -24,7 +24,7 @@ export class StakeMethod extends Modules.BaseMethod {
 	): Promise<number> {
 		const stakeTimeStore = this.stores.get(StakeTimeStore);
 		const stakeTime = await stakeTimeStore.get(ctx, nftID);
-		if (!stakeTime) return 0;
+		if (stakeTime?.time === 0) return 0;
 
 		const timeDiff = currentTime - stakeTime.time;
 

@@ -2,12 +2,14 @@
 import { Modules, StateMachine } from 'klayr-sdk';
 import { unstakePepeSchema } from '../schemas';
 import { NFTMethod } from 'klayr-framework/dist-node/modules/nft';
-import { StakeTimeStore } from '../stores/stakeTime';
 import { StakeMethod } from '../method';
+import { StakeTimeStore } from '../stores/stakeTime';
 
 interface Params {
 	nftID: Buffer;
 }
+
+const lockingModule = 'stakePepe';
 
 export class UnstakePepeCommand extends Modules.BaseCommand {
 	private _method!: StakeMethod;
@@ -50,16 +52,18 @@ export class UnstakePepeCommand extends Modules.BaseCommand {
 		const { nftID } = context.params;
 		const currentTime = context.header.timestamp;
 
-		const nft = await this._nftMethod.getNFT(context, nftID);
-		await this._method.mintRewardsToUser(context, nftID, currentTime, nft.owner);
+		try {
+			const nft = await this._nftMethod.getNFT(context, nftID);
+			await this._nftMethod.unlock(context, lockingModule, nftID);
+			await this._method.mintRewardsToUser(context, nftID, currentTime, nft.owner);
+		} catch (e) {
+			console.log('error:', e);
+		}
 
 		const stakeTimeStore = this.stores.get(StakeTimeStore);
-		await stakeTimeStore.del(context, nftID);
+		await stakeTimeStore.set(context, nftID, { time: 0 });
 		console.log('time set to zero');
 
-		console.log('module name:', this.name);
-
-		await this._nftMethod.unlock(context, this.name, nftID);
 		console.log('UnstakePepeCommand executed');
 	}
 }
