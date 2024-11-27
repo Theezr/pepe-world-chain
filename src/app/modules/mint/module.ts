@@ -65,12 +65,20 @@ export class MintModule extends Modules.BaseModule {
 	// }
 
 	// Lifecycle hooks
-	// public async verifyTransaction(_context: StateMachine.TransactionVerifyContext): Promise<StateMachine.VerificationResult> {
-	// verify transaction will be called multiple times in the transaction pool
-	// return { status: StateMachine.VerifyStatus.OK };
+	// public async verifyTransaction(
+	// 	_context: StateMachine.TransactionVerifyContext,
+	// ): Promise<StateMachine.VerificationResult> {
+	// 	// verify transaction will be called multiple times in the transaction pool
+	// 	return { status: StateMachine.VerifyStatus.OK };
 	// }
 
-	// public async beforeCommandExecute(_context: StateMachine.TransactionExecuteContext): Promise<void> {
+	// public async beforeCommandExecute(
+	// 	context: StateMachine.TransactionExecuteContext,
+	// ): Promise<void> {
+	// 	const test = await context
+	// 		.getMethodContext()
+	// 		.contextStore.set('CONTEXT_STORE_KEY_AVAILABLE_FEE', BigInt(100000000000000));
+	// 	console.log('test', test);
 	// }
 
 	// public async afterCommandExecute(_context: StateMachine.TransactionExecuteContext): Promise<void> {

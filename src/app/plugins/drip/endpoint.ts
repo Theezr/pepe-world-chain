@@ -154,7 +154,9 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 		};
 	}
 
-	public async getNftsForAddress(context: Types.PluginEndpointContext): Promise<{ nfts: any }> {
+	public async getNftsForAddress(
+		context: Types.PluginEndpointContext,
+	): Promise<{ type: string; workers: any; businesses: any }> {
 		validator.validate(getNftsParamsSchema, context.params);
 		const { address } = context.params;
 
@@ -177,10 +179,18 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 			};
 		});
 
-		console.log(decodedNfts);
+		console.log('decodedNfts:', decodedNfts);
+
+		const workers = decodedNfts.filter(nft => nft.attributesArray[0].module === 'worker');
+		const businesses = decodedNfts.filter(nft => nft.attributesArray[0].module === 'business');
+
+		console.log('Worker NFTs:', workers);
+		console.log('Business NFTs:', businesses);
 
 		return {
-			nfts: decodedNfts,
+			type: 'nfts',
+			workers,
+			businesses,
 		};
 	}
 

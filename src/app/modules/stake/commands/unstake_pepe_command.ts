@@ -62,7 +62,6 @@ export class UnstakePepeCommand extends Modules.BaseCommand {
 
 		const stakeTimeStore = this.stores.get(StakeTimeStore);
 		await stakeTimeStore.set(context, nftID, { time: 0 });
-		console.log('time set to zero');
 
 		console.log('UnstakePepeCommand executed');
 	}

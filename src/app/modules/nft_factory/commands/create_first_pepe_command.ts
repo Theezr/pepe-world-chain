@@ -7,13 +7,15 @@ interface Params {
 	recipient: Buffer;
 }
 
-const collectionID = Buffer.from('1');
+const collectionID = Buffer.alloc(4);
 const attributesArray = [
 	{
-		module: 'stats',
+		module: 'worker',
 		attributes: Buffer.from(
 			JSON.stringify({
-				pepeRewardPerSec: 20,
+				name: 'Pepe Normie',
+				level: 1,
+				multiplier: 200,
 			}),
 		),
 	},
@@ -38,11 +40,15 @@ export class CreateFirstPepeCommand extends Modules.BaseCommand {
 	public async execute(context: StateMachine.CommandExecuteContext<Params>): Promise<void> {
 		const { recipient } = context.params;
 
-		await this._nftMethod.create(
-			context.getMethodContext(),
-			recipient,
-			collectionID,
-			attributesArray,
-		);
+		try {
+			await this._nftMethod.create(
+				context.getMethodContext(),
+				recipient,
+				collectionID,
+				attributesArray,
+			);
+		} catch (e) {
+			console.log('error:', e);
+		}
 	}
 }
