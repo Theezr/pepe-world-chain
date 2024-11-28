@@ -57,12 +57,12 @@ yarn build && ./bin/run start --config config/custom_config.json --overwrite-con
 ./bin/run endpoint:invoke stake_getStakeRewardsForNft '{"nftID": "01371337310000000000000000"}'
 ```
 
-### Drip Plugin
+## Drip Plugin
 
 ```
 ./bin/run endpoint:invoke drip_fundTokens '{"address": "klyzrja9we9f2hvtc6uoxtbwutb9b8cqmde8vnfro"}' --pretty
 
-./bin/run endpoint:invoke drip_mintDustGeneratorNft '{"address": "kly3ynkdj3dauwkydhc9qsvybathsv2wwvmnoxcw7"}' --pretty
+./bin/run endpoint:invoke drip_mintFirstPepeBusiness '{"address": "kly22hwq7ejuopapxz7m8tq6w3aokvmym36vjkjot"}' --pretty
 ```
 
 ```
@@ -78,13 +78,13 @@ yarn build && ./bin/run start --config config/custom_config.json --overwrite-con
 ```
 ./bin/run endpoint:invoke token_getBalance '{"tokenID": "0137133700000000", "address":"klyopmzg5g2dem64amsdfy32m86krd8y5p56nd6b9"}' --pretty
 
-./bin/run endpoint:invoke drip_getNftsForAddress '{"address": "kly4mba244me87reyg9fegcy2cesdfw6gq9r8we5x"}' --pretty
+./bin/run endpoint:invoke drip_getNftsForAddress '{"address": "kly22hwq7ejuopapxz7m8tq6w3aokvmym36vjkjot"}' --pretty
 ```
 
 ### Get nft balances
 
 ```
-./bin/run endpoint:invoke nft_getNFTs '{"address":"kly4mba244me87reyg9fegcy2cesdfw6gq9r8we5x"}' --pretty
+./bin/run endpoint:invoke nft_getNFTs '{"address":"kly22d8hsy75dfxu8753cm7cahx9nk4x2qhcwdtga"}' --pretty
 ```
 
 ### Add a new module

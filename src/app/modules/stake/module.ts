@@ -3,11 +3,15 @@
 import { NFTMethod } from 'klayr-framework/dist-node/modules/nft';
 import { Modules } from 'klayr-sdk';
 import { ClaimRewardsCommand } from './commands/claim_rewards_command';
+import { CreateFirstBusinessCommand } from './commands/create_first_business_command';
+import { CreateFirstPepeCommand } from './commands/create_first_pepe_command';
 import { StakePepeCommand } from './commands/stake_pepe_command';
 import { UnstakePepeCommand } from './commands/unstake_pepe_command';
 import { StakeEndpoint } from './endpoint';
 import { StakeMethod } from './method';
 import { StakeTimeStore } from './stores/stakeTime';
+import { WorkerStore } from './stores/workerStore';
+import { BusinessStore } from './stores/businessStore';
 
 export class StakeModule extends Modules.BaseModule {
 	public endpoint = new StakeEndpoint(this.stores, this.offchainStores);
@@ -16,8 +20,16 @@ export class StakeModule extends Modules.BaseModule {
 	public _stakePepeCommand = new StakePepeCommand(this.stores, this.events);
 	public _unstakePepeCommand = new UnstakePepeCommand(this.stores, this.events);
 	public _claimRewardsCommand = new ClaimRewardsCommand(this.stores, this.events);
+	public _createFirstPepeCommand = new CreateFirstPepeCommand(this.stores, this.events);
+	public _createFirstBusinessCommand = new CreateFirstBusinessCommand(this.stores, this.events);
 
-	public commands = [this._stakePepeCommand, this._claimRewardsCommand, this._unstakePepeCommand];
+	public commands = [
+		this._stakePepeCommand,
+		this._claimRewardsCommand,
+		this._unstakePepeCommand,
+		this._createFirstPepeCommand,
+		this._createFirstBusinessCommand,
+	];
 
 	public _nftMethod!: NFTMethod;
 	public _tokenMethod!: Modules.Token.TokenMethod;
@@ -26,6 +38,8 @@ export class StakeModule extends Modules.BaseModule {
 		super();
 		// registeration of stores and events
 		this.stores.register(StakeTimeStore, new StakeTimeStore(this.name, 0));
+		this.stores.register(WorkerStore, new WorkerStore(this.name, 1));
+		this.stores.register(BusinessStore, new BusinessStore(this.name, 2));
 	}
 
 	public addDependencies(args: {
@@ -46,6 +60,14 @@ export class StakeModule extends Modules.BaseModule {
 
 		this._claimRewardsCommand.addDependencies({
 			method: this.method,
+			nftMethod: this._nftMethod,
+		});
+
+		this._createFirstPepeCommand.addDependencies({
+			nftMethod: this._nftMethod,
+		});
+
+		this._createFirstBusinessCommand.addDependencies({
 			nftMethod: this._nftMethod,
 		});
 

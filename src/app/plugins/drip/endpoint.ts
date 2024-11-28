@@ -17,10 +17,17 @@ import { authorizeParamsSchema, fundParamsSchema, getNftsParamsSchema } from './
 import { DripPluginConfig, State } from './types';
 import { LENGTH_COLLECTION_ID } from 'klayr-framework/dist-node/modules/nft/constants';
 import { utils } from '@klayr/cryptography';
+import { decodeAttributes } from './helpers';
 
 // disabled for type annotation
 // eslint-disable-next-line prefer-destructuring
 const validator: klayrvalidator.KlayrValidator = klayrvalidator.validator;
+
+type returnType = {
+	type: string;
+	message: string;
+	address?: string;
+};
 
 export class Endpoint extends Plugins.BasePluginEndpoint {
 	private _state: State = { publicKey: undefined, privateKey: undefined, address: undefined };
@@ -33,8 +40,8 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 		this._client = apiClient;
 		this._config = config;
 	}
-	// eslint-disable-next-line @typescript-eslint/require-await
 
+	// eslint-disable-next-line @typescript-eslint/require-await
 	public async fundTokens(context: Types.PluginEndpointContext): Promise<{ result: string }> {
 		validator.validate(fundParamsSchema, context.params);
 		const { address } = context.params;
@@ -102,56 +109,67 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 		await this._client.transaction.send(transaction);
 	}
 
-	public async mintDustGeneratorNft(
+	private async _mintFirstPepe(
 		context: Types.PluginEndpointContext,
-	): Promise<{ result: any }> {
+		module: string,
+		command: string,
+		type: string,
+		successMessage: string,
+	): Promise<returnType> {
 		validator.validate(getNftsParamsSchema, context.params);
 		const { address } = context.params;
-
-		// CHECK IF ACCOUNT ALREADY HAS DUST GENRRATOR NEFT
 
 		if (!this._state.publicKey || !this._state.privateKey) {
 			throw new Error('Faucet is not enabled.');
 		}
-		const FIXED_COLLECTION_ID = '01234567';
-
-		const mintNft = {
-			address: address,
-			collectionID: FIXED_COLLECTION_ID,
-			attributesArray: [
-				{
-					module: 'stats',
-					attributes: Buffer.from(
-						JSON.stringify({
-							dustPerSecond: 20,
-							multiplier: 1,
-							dustCap: 300,
-							level: 2,
-							rarity: 'common',
-						}),
-					),
-				},
-			],
-		};
 
 		const transaction = await this._client.transaction.create(
 			{
-				module: 'mint',
-				command: 'createNft',
+				module,
+				command,
 				senderPublicKey: this._state.publicKey?.toString('hex'),
 				fee: transactions.convertklyToBeddows(this._config.fee),
-				params: mintNft,
+				params: {
+					recipient: address,
+				},
 				nonce: this.nonce,
 			},
 			this._state.privateKey?.toString('hex') as string,
 		);
 
 		this.nonce = (parseInt(this.nonce) + 1).toString();
-		await this._client.transaction.send(transaction);
+		try {
+			await this._client.transaction.send(transaction);
+		} catch (error) {
+			console.log('error:', error);
+			throw new Error(`Error minting first pepe ${type} ${error}`);
+		}
 
 		return {
-			result: `Successfully funded account at address: ${address as string}`,
+			type,
+			address: address as string,
+			message: successMessage,
 		};
+	}
+
+	public async mintFirstPepeBusiness(context: Types.PluginEndpointContext): Promise<returnType> {
+		return this._mintFirstPepe(
+			context,
+			'stake',
+			'createFirstBusiness',
+			'mintFirstPepeBusiness',
+			'Successfully created pepe business tx',
+		);
+	}
+
+	public async mintFirstPepeWorker(context: Types.PluginEndpointContext): Promise<returnType> {
+		return this._mintFirstPepe(
+			context,
+			'stake',
+			'createFirstPepe',
+			'mintFirstPepeWorker',
+			'Successfully created pepe worker tx',
+		);
 	}
 
 	public async getNftsForAddress(
@@ -165,21 +183,29 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 		});
 		const nftArray = nfts.nfts as any[];
 
-		const decodedNfts = nftArray.map(nft => {
-			const decodedAttributesArray = nft.attributesArray.map(attribute => {
+		const decodedNfts = await Promise.all(
+			nftArray.map(async nft => {
+				const decodedAttributesArray = nft.attributesArray.map(attribute => {
+					return {
+						...attribute,
+						attributes: decodeAttributes(attribute.attributes),
+					};
+				});
+
+				let unclaimedRevenue = 0;
+				if (nft.attributesArray[0].module === 'business') {
+					unclaimedRevenue = await this._client.invoke('stake_getStakeRewardsForNft', {
+						nftID: nft.id,
+					});
+				}
+
 				return {
-					...attribute,
-					attributes: this._decodeAttributes(attribute.attributes),
+					...nft,
+					attributesArray: decodedAttributesArray,
+					unclaimedRevenue,
 				};
-			});
-
-			return {
-				...nft,
-				attributesArray: decodedAttributesArray,
-			};
-		});
-
-		console.log('decodedNfts:', decodedNfts);
+			}),
+		);
 
 		const workers = decodedNfts.filter(nft => nft.attributesArray[0].module === 'worker');
 		const businesses = decodedNfts.filter(nft => nft.attributesArray[0].module === 'business');
@@ -193,15 +219,6 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 			businesses,
 		};
 	}
-
-	private _decodeAttributes = (hexString: string) => {
-		if (!hexString) return {};
-
-		const buffer = Buffer.from(hexString, 'hex');
-		const jsonString = buffer.toString('utf8');
-		const attributes = JSON.parse(jsonString);
-		return attributes;
-	};
 
 	public async authorize(context: Types.PluginEndpointContext): Promise<{ result: string }> {
 		validator.validate<{ enable: boolean; password: string }>(

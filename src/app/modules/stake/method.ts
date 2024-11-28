@@ -31,15 +31,9 @@ export class StakeMethod extends Modules.BaseMethod {
 		const nft = await this._nftMethod.getNFT(ctx, nftID);
 		const attributes = JSON.parse(nft.attributesArray[0].attributes.toString());
 
-		const pepeRewardPerSec = attributes.pepeRewardPerSec;
+		const revenue = attributes.revenue;
 
-		console.log(nft);
-		console.log(stakeTime);
-		console.log({ currentTime });
-		console.log({ timeDiff });
-		console.log({ pepeRewardPerSec });
-
-		return timeDiff * pepeRewardPerSec;
+		return timeDiff * revenue;
 	}
 
 	public async mintRewardsToUser(
