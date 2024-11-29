@@ -13,7 +13,12 @@
  */
 
 import { Plugins, Types, cryptography, validator as klayrvalidator, transactions } from 'klayr-sdk';
-import { authorizeParamsSchema, fundParamsSchema, getNftsParamsSchema } from './schemas';
+import {
+	authorizeParamsSchema,
+	claimRevenueSchema,
+	fundParamsSchema,
+	getNftsParamsSchema,
+} from './schemas';
 import { DripPluginConfig, State } from './types';
 import { LENGTH_COLLECTION_ID } from 'klayr-framework/dist-node/modules/nft/constants';
 import { utils } from '@klayr/cryptography';
@@ -22,12 +27,21 @@ import { decodeAttributes } from './helpers';
 // disabled for type annotation
 // eslint-disable-next-line prefer-destructuring
 const validator: klayrvalidator.KlayrValidator = klayrvalidator.validator;
+const pepeTokenID = '0137133700000000';
 
-type returnType = {
-	type: string;
+interface ReturnType {
+	command: string;
+	address: string;
 	message: string;
-	address?: string;
-};
+}
+
+interface SendTransactionParams {
+	context: Types.PluginEndpointContext;
+	module: string;
+	command: string;
+	params: Record<string, unknown>;
+	successMessage: string;
+}
 
 export class Endpoint extends Plugins.BasePluginEndpoint {
 	private _state: State = { publicKey: undefined, privateKey: undefined, address: undefined };
@@ -109,16 +123,15 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 		await this._client.transaction.send(transaction);
 	}
 
-	private async _mintFirstPepe(
-		context: Types.PluginEndpointContext,
-		module: string,
-		command: string,
-		type: string,
-		successMessage: string,
-	): Promise<returnType> {
-		validator.validate(getNftsParamsSchema, context.params);
-		const { address } = context.params;
-
+	private async _sendTransaction({
+		context,
+		module,
+		command,
+		params,
+		successMessage,
+	}: SendTransactionParams): Promise<ReturnType> {
+		context.logger.info('your log');
+		console.log({ params });
 		if (!this._state.publicKey || !this._state.privateKey) {
 			throw new Error('Faucet is not enabled.');
 		}
@@ -129,58 +142,81 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 				command,
 				senderPublicKey: this._state.publicKey?.toString('hex'),
 				fee: transactions.convertklyToBeddows(this._config.fee),
-				params: {
-					recipient: address,
-				},
+				params,
 				nonce: this.nonce,
 			},
 			this._state.privateKey?.toString('hex') as string,
 		);
 
 		this.nonce = (parseInt(this.nonce) + 1).toString();
+		console.log('before sent');
 		try {
 			await this._client.transaction.send(transaction);
 		} catch (error) {
 			console.log('error:', error);
-			throw new Error(`Error minting first pepe ${type} ${error}`);
+			throw new Error(`Error Sending TX ${command} ${error}`);
 		}
 
 		return {
-			type,
-			address: address as string,
+			command: command,
+			address: (context.params.address as string) || '',
 			message: successMessage,
 		};
 	}
 
-	public async mintFirstPepeBusiness(context: Types.PluginEndpointContext): Promise<returnType> {
-		return this._mintFirstPepe(
+	public async mintFirstPepeBusiness(context: Types.PluginEndpointContext): Promise<ReturnType> {
+		validator.validate(getNftsParamsSchema, context.params);
+		const { address } = context.params;
+
+		return this._sendTransaction({
 			context,
-			'stake',
-			'createFirstBusiness',
-			'mintFirstPepeBusiness',
-			'Successfully created pepe business tx',
-		);
+			module: 'stake',
+			command: 'createFirstBusiness',
+			params: { recipient: address },
+			successMessage: 'Successfully created pepe business tx',
+		});
 	}
 
-	public async mintFirstPepeWorker(context: Types.PluginEndpointContext): Promise<returnType> {
-		return this._mintFirstPepe(
+	public async mintFirstPepeWorker(context: Types.PluginEndpointContext): Promise<ReturnType> {
+		validator.validate(getNftsParamsSchema, context.params);
+		const { address } = context.params;
+
+		return this._sendTransaction({
 			context,
-			'stake',
-			'createFirstPepe',
-			'mintFirstPepeWorker',
-			'Successfully created pepe worker tx',
-		);
+			module: 'stake',
+			command: 'createFirstPepe',
+			params: { recipient: address },
+			successMessage: 'Successfully created pepe worker tx',
+		});
+	}
+
+	public async claimRevenue(context: Types.PluginEndpointContext): Promise<ReturnType> {
+		validator.validate(claimRevenueSchema, context.params);
+		const { nftID } = context.params;
+
+		return this._sendTransaction({
+			context,
+			module: 'stake',
+			command: 'claimRewards',
+			params: { nftID },
+			successMessage: 'Successfully claimed revenue',
+		});
 	}
 
 	public async getNftsForAddress(
 		context: Types.PluginEndpointContext,
-	): Promise<{ type: string; workers: any; businesses: any }> {
+	): Promise<{ command: string; workers: any; businesses: any; tokens: any }> {
 		validator.validate(getNftsParamsSchema, context.params);
 		const { address } = context.params;
 
 		const nfts = await this._client.invoke('nft_getNFTs', {
 			address,
 		});
+		const tokenBalance = await this._client.invoke('token_getBalance', {
+			address,
+			tokenID: pepeTokenID,
+		});
+
 		const nftArray = nfts.nfts as any[];
 
 		const decodedNfts = await Promise.all(
@@ -214,9 +250,10 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 		console.log('Business NFTs:', businesses);
 
 		return {
-			type: 'nfts',
+			command: 'nfts',
 			workers,
 			businesses,
+			tokens: tokenBalance,
 		};
 	}
 

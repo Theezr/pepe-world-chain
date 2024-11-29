@@ -83,6 +83,7 @@ export const getNftsParamsSchema = {
 		address: {
 			type: 'string',
 			format: 'klayr32',
+			fieldNumber: 1,
 		},
 	},
 };
@@ -99,4 +100,16 @@ export const authorizeParamsSchema = {
 			type: 'boolean',
 		},
 	},
+};
+
+export const claimRevenueSchema = {
+	$id: 'ClaimRewardsCommand',
+	type: 'object',
+	properties: {
+		nftID: {
+			dataType: 'string',
+			fieldNumber: 1,
+		},
+	},
+	required: ['nftID'],
 };

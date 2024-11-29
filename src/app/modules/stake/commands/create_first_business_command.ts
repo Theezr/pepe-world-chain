@@ -39,18 +39,18 @@ export class CreateFirstBusinessCommand extends Modules.BaseCommand {
 		const { recipient } = context.params;
 		console.log('recipient verify:', recipient);
 
-		// const businessStore = this.stores.get(BusinessStore);
-		// try {
-		// 	const business = await businessStore.get(context, recipient);
-		// 	if (business) {
-		// 		return {
-		// 			status: StateMachine.VerifyStatus.FAIL,
-		// 			error: new Error('Recipient already minted business'),
-		// 		};
-		// 	}
-		// } catch {
-		// 	return { status: StateMachine.VerifyStatus.OK };
-		// }
+		const businessStore = this.stores.get(BusinessStore);
+		try {
+			const business = await businessStore.get(context, recipient);
+			if (business) {
+				return {
+					status: StateMachine.VerifyStatus.FAIL,
+					error: new Error('Recipient already minted business'),
+				};
+			}
+		} catch {
+			return { status: StateMachine.VerifyStatus.OK };
+		}
 
 		return { status: StateMachine.VerifyStatus.OK };
 	}

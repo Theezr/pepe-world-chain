@@ -72,11 +72,11 @@ yarn build && ./bin/run start --config config/custom_config.json --overwrite-con
 ### Get token balances
 
 ```
-./bin/run endpoint:invoke token_getBalances '{"address":"kly4mba244me87reyg9fegcy2cesdfw6gq9r8we5x"}' --pretty
+./bin/run endpoint:invoke token_getBalances '{"address":"kly22hwq7ejuopapxz7m8tq6w3aokvmym36vjkjot"}' --pretty
 ```
 
 ```
-./bin/run endpoint:invoke token_getBalance '{"tokenID": "0137133700000000", "address":"klyopmzg5g2dem64amsdfy32m86krd8y5p56nd6b9"}' --pretty
+./bin/run endpoint:invoke token_getBalance '{"tokenID": "0137133700000000", "address":"kly22hwq7ejuopapxz7m8tq6w3aokvmym36vjkjot"}' --pretty
 
 ./bin/run endpoint:invoke drip_getNftsForAddress '{"address": "kly22hwq7ejuopapxz7m8tq6w3aokvmym36vjkjot"}' --pretty
 ```

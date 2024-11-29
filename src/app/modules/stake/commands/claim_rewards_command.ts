@@ -42,6 +42,11 @@ export class ClaimRewardsCommand extends Modules.BaseCommand {
 		if (!locked) {
 			return { status: StateMachine.VerifyStatus.FAIL, error: new Error('NFT is not staked') };
 		}
+		const stakeTimeStore = this.stores.get(StakeTimeStore);
+		const stakeTime = await stakeTimeStore.get(context, nftID);
+		if (!stakeTime || stakeTime.time === 0) {
+			return { status: StateMachine.VerifyStatus.FAIL, error: new Error('No stake time') };
+		}
 
 		return { status: StateMachine.VerifyStatus.OK };
 	}
