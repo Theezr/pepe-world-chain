@@ -203,6 +203,32 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 		});
 	}
 
+	public async unstakePepe(context: Types.PluginEndpointContext): Promise<ReturnType> {
+		validator.validate(claimRevenueSchema, context.params);
+		const { nftID } = context.params;
+
+		return this._sendTransaction({
+			context,
+			module: 'stake',
+			command: 'unstakePepe',
+			params: { nftID },
+			successMessage: 'Successfully unstaked pepe',
+		});
+	}
+
+	public async stakePepe(context: Types.PluginEndpointContext): Promise<ReturnType> {
+		validator.validate(claimRevenueSchema, context.params);
+		const { nftID } = context.params;
+
+		return this._sendTransaction({
+			context,
+			module: 'stake',
+			command: 'stakePepe',
+			params: { nftID },
+			successMessage: 'Successfully staked pepe',
+		});
+	}
+
 	public async getNftsForAddress(
 		context: Types.PluginEndpointContext,
 	): Promise<{ command: string; workers: any; businesses: any; tokens: any }> {

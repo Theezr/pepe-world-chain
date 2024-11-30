@@ -9,8 +9,6 @@ interface Params {
 	nftID: Buffer;
 }
 
-const lockingModule = 'stakePepe';
-
 export class UnstakePepeCommand extends Modules.BaseCommand {
 	private _method!: StakeMethod;
 	private _nftMethod!: NFTMethod;
@@ -41,7 +39,7 @@ export class UnstakePepeCommand extends Modules.BaseCommand {
 		// }
 
 		const locked = this._nftMethod.isNFTLocked(nft);
-		if (!locked) {
+		if (!locked || !nft.lockingModule) {
 			return { status: StateMachine.VerifyStatus.FAIL, error: new Error('NFT is not staked') };
 		}
 
@@ -54,7 +52,7 @@ export class UnstakePepeCommand extends Modules.BaseCommand {
 
 		try {
 			const nft = await this._nftMethod.getNFT(context, nftID);
-			await this._nftMethod.unlock(context, lockingModule, nftID);
+			await this._nftMethod.unlock(context, nft.lockingModule!, nftID);
 			await this._method.mintRewardsToUser(context, nftID, currentTime, nft.owner);
 		} catch (e) {
 			console.log('error:', e);

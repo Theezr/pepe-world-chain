@@ -63,6 +63,8 @@ yarn build && ./bin/run start --config config/custom_config.json --overwrite-con
 ./bin/run endpoint:invoke drip_fundTokens '{"address": "klyzrja9we9f2hvtc6uoxtbwutb9b8cqmde8vnfro"}' --pretty
 
 ./bin/run endpoint:invoke drip_mintFirstPepeBusiness '{"address": "kly22hwq7ejuopapxz7m8tq6w3aokvmym36vjkjot"}' --pretty
+
+./bin/run endpoint:invoke drip_unstakePepe '{"nftID": "01371337000000010000000000000000"}' --pretty
 ```
 
 ```

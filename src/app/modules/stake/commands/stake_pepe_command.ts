@@ -28,12 +28,12 @@ export class StakePepeCommand extends Modules.BaseCommand {
 			return { status: StateMachine.VerifyStatus.FAIL, error: new Error('NFT not found') };
 		}
 
-		if (nft.owner !== context.transaction.senderAddress) {
-			return {
-				status: StateMachine.VerifyStatus.FAIL,
-				error: new Error('NFT is not owned by sender'),
-			};
-		}
+		// if (nft.owner !== context.transaction.senderAddress) {
+		// 	return {
+		// 		status: StateMachine.VerifyStatus.FAIL,
+		// 		error: new Error('NFT is not owned by sender'),
+		// 	};
+		// }
 
 		const locked = this._nftMethod.isNFTLocked(nft);
 		if (locked) {
