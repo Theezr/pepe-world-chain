@@ -54,13 +54,14 @@ yarn build && ./bin/run start --config config/custom_config.json --overwrite-con
 ### Upgrade Business
 
 ```
- ./bin/run transaction:create stake upgradeBusiness 10000000 --params='{"nftID": "013713377c7c7e160000000000000000"}' --json --pretty --key-derivation-path="m/44'/134'/45'"
+ ./bin/run transaction:create stake upgradeBusiness 10000000 --params='{"nftID": "01371337000000010000000000000001"}' --json --pretty --key-derivation-path="m/44'/134'/45'"
 ```
 
 ### getStakeRewardsForNft
 
 ```
 ./bin/run endpoint:invoke stake_getStakeRewardsForNft '{"nftID": "01371337310000000000000000"}'
+./bin/run endpoint:invoke stake_getUpgradeCost '{"nftID": "01371337000000010000000000000001"}'
 ```
 
 ## Drip Plugin
@@ -92,7 +93,7 @@ yarn build && ./bin/run start --config config/custom_config.json --overwrite-con
 ### Get nft balances
 
 ```
-./bin/run endpoint:invoke nft_getNFTs '{"address":"kly22d8hsy75dfxu8753cm7cahx9nk4x2qhcwdtga"}' --pretty
+./bin/run endpoint:invoke nft_getNFTs '{"address":"kly22hwq7ejuopapxz7m8tq6w3aokvmym36vjkjot"}' --pretty
 ```
 
 ### Add a new module

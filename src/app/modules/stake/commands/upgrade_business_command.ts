@@ -3,25 +3,28 @@ import { Modules, StateMachine } from 'klayr-sdk';
 import { upgradeBusinessSchema } from '../schemas';
 import { NFTMethod } from 'klayr-framework/dist-node/modules/nft';
 import { TokenMethod } from 'klayr-framework/dist-node/modules/token';
-
-interface Attributes {
-	name: string;
-	quantity: number;
-	revenue: number;
-}
+import { StakeMethod } from '../method';
+import { NftAttributes } from '../types';
+import { StakeTimeStore } from '../stores/stakeTime';
 
 interface Params {
 	nftID: Buffer;
 }
 
 export class UpgradeBusinessCommand extends Modules.BaseCommand {
+	private _method!: StakeMethod;
 	private _tokenMethod!: TokenMethod;
 	private _nftMethod!: NFTMethod;
 
 	public schema = upgradeBusinessSchema;
 	public chainTokenID = Buffer.from('0137133700000000', 'hex');
 
-	public addDependencies(args: { tokenMethod: TokenMethod; nftMethod: NFTMethod }) {
+	public addDependencies(args: {
+		method: StakeMethod;
+		tokenMethod: TokenMethod;
+		nftMethod: NFTMethod;
+	}) {
+		this._method = args.method;
 		this._tokenMethod = args.tokenMethod;
 		this._nftMethod = args.nftMethod;
 	}
@@ -37,8 +40,8 @@ export class UpgradeBusinessCommand extends Modules.BaseCommand {
 			return { status: StateMachine.VerifyStatus.FAIL, error: new Error('NFT not found') };
 		}
 
-		const attributes: Attributes = JSON.parse(nft.attributesArray[0].attributes.toString());
-		const fee = this.calculateFee(attributes);
+		const attributes: NftAttributes = JSON.parse(nft.attributesArray[0].attributes.toString());
+		const fee = this._method.calculateCost(attributes);
 
 		const userBalance = await this._tokenMethod.getAvailableBalance(
 			context,
@@ -56,11 +59,17 @@ export class UpgradeBusinessCommand extends Modules.BaseCommand {
 
 	public async execute(context: StateMachine.CommandExecuteContext<Params>): Promise<void> {
 		const { nftID } = context.params;
+		const currentTime = context.header.timestamp;
 
 		const nft = await this._nftMethod.getNFT(context, nftID);
-		const attributes: Attributes = JSON.parse(nft.attributesArray[0].attributes.toString());
-		const fee = this.calculateFee(attributes);
+		const attributes: NftAttributes = JSON.parse(nft.attributesArray[0].attributes.toString());
+		const fee = this._method.calculateCost(attributes);
 		try {
+			await this._method.mintRewardsToUser(context, nftID, currentTime, nft.owner);
+			const stakeTimeStore = this.stores.get(StakeTimeStore);
+			await stakeTimeStore.set(context, nftID, { time: currentTime });
+
+			await this._tokenMethod.initializeUserAccount(context, nft.owner, this.chainTokenID);
 			await this._tokenMethod.burn(context, nft.owner, this.chainTokenID, BigInt(fee));
 		} catch (error) {
 			console.log('Error burning fee:', error);
@@ -75,7 +84,7 @@ export class UpgradeBusinessCommand extends Modules.BaseCommand {
 		try {
 			await this._nftMethod.setAttributes(
 				context.getMethodContext(),
-				nft.lockingModule!,
+				'business',
 				nftID,
 				Buffer.from(newAttributes),
 			);
@@ -83,9 +92,5 @@ export class UpgradeBusinessCommand extends Modules.BaseCommand {
 			console.log('Error setting attributes:', error);
 			throw new Error('Error setting attributes');
 		}
-	}
-
-	private calculateFee(_: Attributes): number {
-		return 10000000000000000000000000000;
 	}
 }

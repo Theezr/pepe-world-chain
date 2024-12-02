@@ -4,6 +4,7 @@ import { createFirstSchema } from '../schemas';
 import { LENGTH_INDEX, NFTMethod } from 'klayr-framework/dist-node/modules/nft';
 import { BusinessStore } from '../stores/businessStore';
 import { StakeTimeStore } from '../stores/stakeTime';
+import { NftType } from '../types';
 
 interface Params {
 	recipient: Buffer;
@@ -16,8 +17,9 @@ const attributesArray = [
 		attributes: Buffer.from(
 			JSON.stringify({
 				name: 'Pepe Lemonade Stand',
+				type: NftType.LemonadeStand,
+				imageUrl: 'https://example.com/image.png',
 				quantity: 1,
-				revenue: 1,
 			}),
 		),
 	},

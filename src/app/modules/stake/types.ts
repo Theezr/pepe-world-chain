@@ -1,19 +1,11 @@
-export interface DripPluginConfig {
-	port: number;
-	host: string;
-	encryptedPrivateKey: string;
-	tokenID: string;
-	applicationUrl: string;
-	fee: string;
-	amount: string;
-	tokenPrefix: string;
+export interface NftAttributes {
+	name: string;
+	imageUrl: string;
+	type: string;
+	quantity: number;
+	multiplier?: number;
 }
 
-export interface State {
-	publicKey?: Buffer;
-	privateKey?: Buffer;
-	address?: string;
-}
 export enum NftType {
 	LemonadeStand = 'lemonadeStand',
 	CoffeeShop = 'coffeeShop',

@@ -5,8 +5,9 @@ import {
 	CommandExecuteContext,
 	ImmutableMethodContext,
 } from 'klayr-framework/dist-node/state_machine';
+import { NftAttributes, nftData } from './types';
 
-const stakeRewardToken = '0137133700000000';
+const stakeRewardToken = Buffer.from('0137133700000000', 'hex');
 
 export class StakeMethod extends Modules.BaseMethod {
 	private _nftMethod!: NFTMethod;
@@ -15,6 +16,25 @@ export class StakeMethod extends Modules.BaseMethod {
 	public addDependencies(args: { tokenMethod: Modules.Token.TokenMethod; nftMethod: NFTMethod }) {
 		this._nftMethod = args.nftMethod;
 		this._tokenMethod = args.tokenMethod;
+	}
+
+	public calculateCost(nftAttributes: NftAttributes): number {
+		const { baseCost, growthRate, typeMultiplier } = nftData[nftAttributes.type];
+		const { quantity } = nftAttributes;
+		const cost = baseCost * Math.pow(1 + growthRate, quantity - 1) * typeMultiplier;
+		return Math.round(cost);
+	}
+
+	public calculateRevenue(nftAttributes: NftAttributes): number {
+		const { baseRevenue, maxRevenue } = nftData[nftAttributes.type];
+		const { quantity, multiplier = 1 } = nftAttributes;
+		const revenue = baseRevenue * quantity * multiplier;
+		const cappedRevenue = Math.min(revenue, maxRevenue * multiplier);
+		return Math.round(cappedRevenue);
+	}
+
+	public getNft(ctx: ImmutableMethodContext, nftID: Buffer) {
+		return this._nftMethod.getNFT(ctx, nftID);
 	}
 
 	public async getStakeRewardsForNft(
@@ -31,7 +51,8 @@ export class StakeMethod extends Modules.BaseMethod {
 		const nft = await this._nftMethod.getNFT(ctx, nftID);
 		const attributes = JSON.parse(nft.attributesArray[0].attributes.toString());
 
-		const revenue = attributes.revenue;
+		const revenue = this.calculateRevenue(attributes);
+		console.log({ revenue, timeDiff });
 
 		return timeDiff * revenue;
 	}
@@ -44,18 +65,9 @@ export class StakeMethod extends Modules.BaseMethod {
 	): Promise<void> {
 		const rewards = await this.getStakeRewardsForNft(ctx, nftID, currentTime);
 
-		await this._tokenMethod.initializeUserAccount(
-			ctx,
-			userAddress,
-			Buffer.from(stakeRewardToken, 'hex'),
-		);
+		await this._tokenMethod.initializeUserAccount(ctx, userAddress, stakeRewardToken);
 
-		await this._tokenMethod.mint(
-			ctx,
-			userAddress,
-			Buffer.from(stakeRewardToken, 'hex'),
-			BigInt(rewards),
-		);
+		await this._tokenMethod.mint(ctx, userAddress, stakeRewardToken, BigInt(rewards));
 
 		console.log(`minted ${rewards}`);
 	}

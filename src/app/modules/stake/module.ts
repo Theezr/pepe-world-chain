@@ -75,6 +75,7 @@ export class StakeModule extends Modules.BaseModule {
 		});
 
 		this._upgradeBusinessCommand.addDependencies({
+			method: this.method,
 			tokenMethod: this._tokenMethod,
 			nftMethod: this._nftMethod,
 		});

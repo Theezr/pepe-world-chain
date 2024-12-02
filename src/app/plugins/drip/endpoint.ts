@@ -19,7 +19,7 @@ import {
 	fundParamsSchema,
 	getNftsParamsSchema,
 } from './schemas';
-import { DripPluginConfig, State } from './types';
+import { DripPluginConfig, nftData, State } from './types';
 import { LENGTH_COLLECTION_ID } from 'klayr-framework/dist-node/modules/nft/constants';
 import { utils } from '@klayr/cryptography';
 import { decodeAttributes } from './helpers';
@@ -229,6 +229,19 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 		});
 	}
 
+	public async upgradeBusiness(context: Types.PluginEndpointContext): Promise<ReturnType> {
+		validator.validate(claimRevenueSchema, context.params);
+		const { nftID } = context.params;
+
+		return this._sendTransaction({
+			context,
+			module: 'stake',
+			command: 'upgradeBusiness',
+			params: { nftID },
+			successMessage: 'Successfully upgraded business',
+		});
+	}
+
 	public async getNftsForAddress(
 		context: Types.PluginEndpointContext,
 	): Promise<{ command: string; workers: any; businesses: any; tokens: any }> {
@@ -248,22 +261,31 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 		const decodedNfts = await Promise.all(
 			nftArray.map(async nft => {
 				const decodedAttributesArray = nft.attributesArray.map(attribute => {
+					const decodedAttributes = decodeAttributes(attribute.attributes);
 					return {
 						...attribute,
-						attributes: decodeAttributes(attribute.attributes),
+						attributes: decodedAttributes,
 					};
 				});
 
 				let unclaimedRevenue = 0;
-				if (nft.attributesArray[0].module === 'business') {
+				let upgradeCost = 0;
+				if (decodedAttributesArray[0].module === 'business') {
 					unclaimedRevenue = await this._client.invoke('stake_getStakeRewardsForNft', {
 						nftID: nft.id,
 					});
+					upgradeCost = await this._client.invoke('stake_getUpgradeCost', {
+						nftID: nft.id,
+					});
 				}
+				const nftDefaults = nftData[decodedAttributesArray[0].attributes.type];
 
 				return {
 					...nft,
 					attributesArray: decodedAttributesArray,
+					maxRevenue: nftDefaults?.maxRevenue ?? 0,
+					baseRevenue: nftDefaults?.baseRevenue ?? 0,
+					upgradeCost,
 					unclaimedRevenue,
 				};
 			}),
