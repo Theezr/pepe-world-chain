@@ -7,11 +7,12 @@ import { CreateFirstBusinessCommand } from './commands/create_first_business_com
 import { CreateFirstPepeCommand } from './commands/create_first_pepe_command';
 import { StakePepeCommand } from './commands/stake_pepe_command';
 import { UnstakePepeCommand } from './commands/unstake_pepe_command';
+import { UpgradeBusinessCommand } from './commands/upgrade_business_command';
 import { StakeEndpoint } from './endpoint';
 import { StakeMethod } from './method';
+import { BusinessStore } from './stores/businessStore';
 import { StakeTimeStore } from './stores/stakeTime';
 import { WorkerStore } from './stores/workerStore';
-import { BusinessStore } from './stores/businessStore';
 
 export class StakeModule extends Modules.BaseModule {
 	public endpoint = new StakeEndpoint(this.stores, this.offchainStores);
@@ -22,6 +23,7 @@ export class StakeModule extends Modules.BaseModule {
 	public _claimRewardsCommand = new ClaimRewardsCommand(this.stores, this.events);
 	public _createFirstPepeCommand = new CreateFirstPepeCommand(this.stores, this.events);
 	public _createFirstBusinessCommand = new CreateFirstBusinessCommand(this.stores, this.events);
+	public _upgradeBusinessCommand = new UpgradeBusinessCommand(this.stores, this.events);
 
 	public commands = [
 		this._stakePepeCommand,
@@ -29,6 +31,7 @@ export class StakeModule extends Modules.BaseModule {
 		this._unstakePepeCommand,
 		this._createFirstPepeCommand,
 		this._createFirstBusinessCommand,
+		this._upgradeBusinessCommand,
 	];
 
 	public _nftMethod!: NFTMethod;
@@ -68,6 +71,11 @@ export class StakeModule extends Modules.BaseModule {
 		});
 
 		this._createFirstBusinessCommand.addDependencies({
+			nftMethod: this._nftMethod,
+		});
+
+		this._upgradeBusinessCommand.addDependencies({
+			tokenMethod: this._tokenMethod,
 			nftMethod: this._nftMethod,
 		});
 

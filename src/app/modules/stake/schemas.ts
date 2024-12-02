@@ -46,3 +46,15 @@ export const createFirstSchema = {
 	},
 	required: ['recipient'],
 };
+
+export const upgradeBusinessSchema = {
+	$id: 'UpgradeBusinessCommand',
+	type: 'object',
+	properties: {
+		nftID: {
+			dataType: 'bytes',
+			fieldNumber: 1,
+		},
+	},
+	required: ['nftID'],
+};

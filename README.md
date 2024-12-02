@@ -51,6 +51,12 @@ yarn build && ./bin/run start --config config/custom_config.json --overwrite-con
  ./bin/run transaction:create mint upgradeNft 10000000 --params='{"module": "mint", "nftID": "013713377c7c7e160000000000000000", attri}' --json --pretty
 ```
 
+### Upgrade Business
+
+```
+ ./bin/run transaction:create stake upgradeBusiness 10000000 --params='{"nftID": "013713377c7c7e160000000000000000"}' --json --pretty --key-derivation-path="m/44'/134'/45'"
+```
+
 ### getStakeRewardsForNft
 
 ```
