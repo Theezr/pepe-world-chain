@@ -63,7 +63,7 @@ export class UpgradeBusinessCommand extends Modules.BaseCommand {
 			const stakeTimeStore = this.stores.get(StakeTimeStore);
 			await stakeTimeStore.set(context, nftID, { time: currentTime });
 
-			await this._method.burnFeeForRecipient(context, nft.owner, attributes.type);
+			await this._method.burnFeeForRecipient(context, nft.owner, attributes);
 		} catch (error) {
 			console.log('Error burning fee:', error);
 			throw new Error('Error burning fee');

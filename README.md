@@ -38,7 +38,7 @@ yarn build && ./bin/run start --config config/custom_config.json --overwrite-con
 ### claimRewards
 
 ```
-./bin/run transaction:create stake claimRewards 10000000 --params='{"nftID": "01371337310000000000000000"}' --json --pretty --key-derivation-path="m/44'/134'/45'"
+./bin/run transaction:create stake claimRewards 10000000 --params='{"nftID": "01371337000000010000000000000008"}' --json --pretty --key-derivation-path="m/44'/134'/45'"
 ```
 
 ### nft
@@ -75,6 +75,7 @@ yarn build && ./bin/run start --config config/custom_config.json --overwrite-con
 ./bin/run endpoint:invoke drip_mintPepeBusiness '{"address": "klycnpgo6unchuc4cdvetp4nb78ayfhs5d5cfft7b", "type":"lemonadeStand"}' --pretty
 
 ./bin/run endpoint:invoke drip_unstakePepe '{"nftID": "01371337000000010000000000000000"}' --pretty
+./bin/run endpoint:invoke drip_claimRevenue '{"nftID": "01371337000000010000000000000008"}' --pretty
 ```
 
 ```

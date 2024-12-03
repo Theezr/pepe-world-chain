@@ -14,9 +14,9 @@
 
 import { Plugins, Types, cryptography, validator as klayrvalidator, transactions } from 'klayr-sdk';
 import { authorizeParamsSchema, claimRevenueSchema, getNftsParamsSchema } from './schemas';
-import { DripPluginConfig, nftData, NftType, State } from './types';
+import { DripPluginConfig, nftData, State } from './types';
 
-import { decodeAttributes } from './helpers';
+import { decodeAttributes, isValidNftType } from './helpers';
 
 // disabled for type annotation
 // eslint-disable-next-line prefer-destructuring
@@ -41,7 +41,7 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 	private _state: State = { publicKey: undefined, privateKey: undefined, address: undefined };
 	private _client!: Plugins.BasePlugin['apiClient'];
 	private _config!: DripPluginConfig;
-	private nonce: string = '';
+	// private nonce: string = '';
 
 	public init(state: State, apiClient: Plugins.BasePlugin['apiClient'], config: DripPluginConfig) {
 		this._state = state;
@@ -71,12 +71,12 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 				senderPublicKey: this._state.publicKey?.toString('hex'),
 				fee: transactions.convertklyToBeddows(this._config.fee),
 				params,
-				nonce: this.nonce,
+				// nonce: this.nonce,
 			},
 			this._state.privateKey?.toString('hex') as string,
 		);
 
-		this.nonce = (parseInt(this.nonce) + 1).toString();
+		// this.nonce = (parseInt(this.nonce) + 1).toString();
 		console.log('before sent');
 		try {
 			await this._client.transaction.send(transaction);
@@ -96,7 +96,7 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 		validator.validate(getNftsParamsSchema, context.params);
 		const { address, type } = context.params;
 
-		if (type !== NftType.LemonadeStand && type !== NftType.CoffeeShop) {
+		if (!isValidNftType(type as string)) {
 			throw new Error('Invalid business type');
 		}
 
@@ -267,12 +267,12 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 				: undefined;
 			const changedState = enable ? 'enabled' : 'disabled';
 
-			const account = await this._client.invoke('auth_getAuthAccount', {
-				address: this._state.address,
-			});
+			// const account = await this._client.invoke('auth_getAuthAccount', {
+			// 	address: this._state.address,
+			// });
 
-			console.log('nonce:', account);
-			this.nonce = account.nonce as string;
+			// console.log('nonce:', account);
+			// this.nonce = account.nonce as string;
 
 			return {
 				result: `Successfully ${changedState} the dripper.`,

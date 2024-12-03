@@ -97,11 +97,8 @@ export class StakeMethod extends Modules.BaseMethod {
 	public async burnFeeForRecipient(
 		ctx: CommandExecuteContext<any>,
 		userAddress: Buffer,
-		type: string,
+		attributes: NftAttributes,
 	): Promise<void> {
-		const attributes: NftAttributes = JSON.parse(
-			this.createAttributeArray(nftData[type])[0].attributes.toString(),
-		);
 		const fee = this.calculateCost(attributes);
 
 		await this._tokenMethod.initializeUserAccount(ctx, userAddress, stakeRewardToken);

@@ -1,3 +1,5 @@
+import { NftType } from './types';
+
 export function decodeAttributes(hexString: string) {
 	if (!hexString) return {};
 
@@ -9,4 +11,8 @@ export function decodeAttributes(hexString: string) {
 
 export function wait(ms: number) {
 	return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export function isValidNftType(type: string): boolean {
+	return Object.values(NftType).includes(type as NftType);
 }

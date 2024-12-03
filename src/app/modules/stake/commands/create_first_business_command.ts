@@ -6,6 +6,7 @@ import { BusinessStore } from '../stores/businessStore';
 import { StakeTimeStore } from '../stores/stakeTime';
 import { NftAttributes, nftData, NftType } from '../types';
 import { StakeMethod } from '../method';
+import { isValidNftType } from '../../../plugins/drip/helpers';
 
 interface Params {
 	recipient: Buffer;
@@ -31,7 +32,8 @@ export class CreateFirstBusinessCommand extends Modules.BaseCommand {
 	): Promise<StateMachine.VerificationResult> {
 		const { recipient, type } = context.params;
 		console.log('recipient verify:', recipient);
-		if (type !== NftType.LemonadeStand && type !== NftType.CoffeeShop) {
+
+		if (!isValidNftType(type as string)) {
 			return {
 				status: StateMachine.VerifyStatus.FAIL,
 				error: new Error('Invalid type'),
@@ -75,7 +77,7 @@ export class CreateFirstBusinessCommand extends Modules.BaseCommand {
 
 		try {
 			if (type !== NftType.LemonadeStand) {
-				await this._method.burnFeeForRecipient(context, recipient, attributes.type);
+				await this._method.burnFeeForRecipient(context, recipient, attributes);
 			}
 			await this._nftMethod.create(
 				context.getMethodContext(),
