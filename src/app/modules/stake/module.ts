@@ -71,6 +71,7 @@ export class StakeModule extends Modules.BaseModule {
 		});
 
 		this._createFirstBusinessCommand.addDependencies({
+			method: this.method,
 			nftMethod: this._nftMethod,
 		});
 

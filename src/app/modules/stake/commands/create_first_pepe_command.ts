@@ -15,7 +15,7 @@ const attributesArray = [
 		module: 'worker',
 		attributes: Buffer.from(
 			JSON.stringify({
-				name: 'Pepe Normie',
+				name: 'Scuffed Pimp',
 				level: 1,
 				multiplier: 1,
 			}),

@@ -13,15 +13,9 @@
  */
 
 import { Plugins, Types, cryptography, validator as klayrvalidator, transactions } from 'klayr-sdk';
-import {
-	authorizeParamsSchema,
-	claimRevenueSchema,
-	fundParamsSchema,
-	getNftsParamsSchema,
-} from './schemas';
-import { DripPluginConfig, nftData, State } from './types';
-import { LENGTH_COLLECTION_ID } from 'klayr-framework/dist-node/modules/nft/constants';
-import { utils } from '@klayr/cryptography';
+import { authorizeParamsSchema, claimRevenueSchema, getNftsParamsSchema } from './schemas';
+import { DripPluginConfig, nftData, NftType, State } from './types';
+
 import { decodeAttributes } from './helpers';
 
 // disabled for type annotation
@@ -56,72 +50,6 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 	}
 
 	// eslint-disable-next-line @typescript-eslint/require-await
-	public async fundTokens(context: Types.PluginEndpointContext): Promise<{ result: string }> {
-		validator.validate(fundParamsSchema, context.params);
-		const { address } = context.params;
-
-		if (!this._state.publicKey || !this._state.privateKey) {
-			throw new Error('Faucet is not enabled.');
-		}
-
-		await this._transferFunds(address as string);
-
-		return {
-			result: `Successfully funded account at address: ${address as string}`,
-		};
-	}
-
-	private async _transferFunds(address: string): Promise<void> {
-		// const mintParams = {
-		// 	tokenID: this._config.tokenID,
-		// 	amount: '1',
-		// 	recipient: address,
-		// 	data: '',
-		// };
-
-		const mintNft = {
-			// tokenID: this._config.tokenID,
-			// amount: transactions.convertklyToBeddows(this._config.amount),
-			address: address,
-			collectionID: utils.getRandomBytes(LENGTH_COLLECTION_ID),
-			attributesArray: [
-				{
-					module: 'mint',
-					attributes: Buffer.from(
-						JSON.stringify({
-							level: 2,
-							txpersec: 10,
-							etc: 'heelTest2',
-						}),
-					),
-				},
-			],
-		};
-
-		// const upgradeNft = {
-		// 	nftID: '01371337e7197bfc0000000000000000',
-		// 	module: 'mint',
-		// 	attributes: Buffer.from('22'),
-		// };
-
-		console.log('transferTransactionParams:', mintNft);
-
-		const transaction = await this._client.transaction.create(
-			{
-				module: 'mint',
-				command: 'createNft',
-				senderPublicKey: this._state.publicKey?.toString('hex'),
-				fee: transactions.convertklyToBeddows(this._config.fee),
-				params: mintNft,
-				nonce: this.nonce,
-			},
-			this._state.privateKey?.toString('hex') as string,
-		);
-
-		this.nonce = (parseInt(this.nonce) + 1).toString();
-
-		await this._client.transaction.send(transaction);
-	}
 
 	private async _sendTransaction({
 		context,
@@ -164,15 +92,19 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 		};
 	}
 
-	public async mintFirstPepeBusiness(context: Types.PluginEndpointContext): Promise<ReturnType> {
+	public async mintPepeBusiness(context: Types.PluginEndpointContext): Promise<ReturnType> {
 		validator.validate(getNftsParamsSchema, context.params);
-		const { address } = context.params;
+		const { address, type } = context.params;
+
+		if (type !== NftType.LemonadeStand && type !== NftType.CoffeeShop) {
+			throw new Error('Invalid business type');
+		}
 
 		return this._sendTransaction({
 			context,
 			module: 'stake',
 			command: 'createFirstBusiness',
-			params: { recipient: address },
+			params: { recipient: address, type },
 			successMessage: 'Successfully created pepe business tx',
 		});
 	}
@@ -279,11 +211,12 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 					});
 				}
 				const nftDefaults = nftData[decodedAttributesArray[0].attributes.type];
+				const maxRevenue = nftDefaults?.maxRevenue ?? 0;
 
 				return {
 					...nft,
 					attributesArray: decodedAttributesArray,
-					maxRevenue: nftDefaults?.maxRevenue ?? 0,
+					maxRevenue: maxRevenue * decodedAttributesArray[0].attributes.quantity,
 					baseRevenue: nftDefaults?.baseRevenue ?? 0,
 					upgradeCost,
 					unclaimedRevenue,

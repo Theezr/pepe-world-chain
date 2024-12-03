@@ -1,36 +1,27 @@
 /* eslint-disable class-methods-use-this */
 import { Modules, StateMachine } from 'klayr-sdk';
-import { createFirstSchema } from '../schemas';
+import { createBusinessSchema } from '../schemas';
 import { LENGTH_INDEX, NFTMethod } from 'klayr-framework/dist-node/modules/nft';
 import { BusinessStore } from '../stores/businessStore';
 import { StakeTimeStore } from '../stores/stakeTime';
-import { NftType } from '../types';
+import { NftAttributes, nftData, NftType } from '../types';
+import { StakeMethod } from '../method';
 
 interface Params {
 	recipient: Buffer;
+	type: string;
 }
+
 const ownChainID = Buffer.from('01371337', 'hex');
-const collectionID = Buffer.from('00000001', 'hex');
-const attributesArray = [
-	{
-		module: 'business',
-		attributes: Buffer.from(
-			JSON.stringify({
-				name: 'Pepe Lemonade Stand',
-				type: NftType.LemonadeStand,
-				imageUrl: 'https://example.com/image.png',
-				quantity: 1,
-			}),
-		),
-	},
-];
 
 export class CreateFirstBusinessCommand extends Modules.BaseCommand {
+	private _method!: StakeMethod;
 	private _nftMethod!: NFTMethod;
 
-	public schema = createFirstSchema;
+	public schema = createBusinessSchema;
 
-	public addDependencies(args: { nftMethod: NFTMethod }) {
+	public addDependencies(args: { method: StakeMethod; nftMethod: NFTMethod }) {
+		this._method = args.method;
 		this._nftMethod = args.nftMethod;
 	}
 
@@ -38,47 +29,66 @@ export class CreateFirstBusinessCommand extends Modules.BaseCommand {
 	public async verify(
 		context: StateMachine.CommandVerifyContext<Params>,
 	): Promise<StateMachine.VerificationResult> {
-		const { recipient } = context.params;
+		const { recipient, type } = context.params;
 		console.log('recipient verify:', recipient);
+		if (type !== NftType.LemonadeStand && type !== NftType.CoffeeShop) {
+			return {
+				status: StateMachine.VerifyStatus.FAIL,
+				error: new Error('Invalid type'),
+			};
+		}
 
+		const combinedKey = Buffer.concat([recipient, Buffer.from(type)]);
 		const businessStore = this.stores.get(BusinessStore);
-		try {
-			const business = await businessStore.get(context, recipient);
-			if (business) {
-				return {
-					status: StateMachine.VerifyStatus.FAIL,
-					error: new Error('Recipient already minted business'),
-				};
-			}
-		} catch {
+
+		const hasBusiness = await businessStore.has(context, combinedKey);
+		if (hasBusiness) {
+			return {
+				status: StateMachine.VerifyStatus.FAIL,
+				error: new Error('Recipient already minted this type of business'),
+			};
+		}
+
+		if (type === NftType.LemonadeStand) {
 			return { status: StateMachine.VerifyStatus.OK };
+		}
+
+		const hasEnoughBalance = await this._method.checkForBalance(context, recipient, type);
+		if (!hasEnoughBalance) {
+			return { status: StateMachine.VerifyStatus.FAIL, error: new Error('Insufficient funds') };
 		}
 
 		return { status: StateMachine.VerifyStatus.OK };
 	}
 
 	public async execute(context: StateMachine.CommandExecuteContext<Params>): Promise<void> {
-		const { recipient } = context.params;
-		console.log('recipient execute:', recipient);
+		const { recipient, type } = context.params;
 
-		const index = await this._nftMethod.getNextAvailableIndex(context, collectionID);
+		const data = nftData[type];
+		const attributesArray = this._method.createAttributeArray(data);
+		const attributes: NftAttributes = JSON.parse(attributesArray[0].attributes.toString());
+
+		const index = await this._nftMethod.getNextAvailableIndex(context, data.collectionID);
 		const indexBytes = Buffer.alloc(LENGTH_INDEX);
 		indexBytes.writeBigInt64BE(index);
-		const nftID = Buffer.concat([ownChainID, collectionID, indexBytes]);
-
-		console.log('nftID:', nftID.toString('hex'));
+		const nftID = Buffer.concat([ownChainID, data.collectionID, indexBytes]);
 
 		try {
+			if (type !== NftType.LemonadeStand) {
+				await this._method.burnFeeForRecipient(context, recipient, attributes.type);
+			}
 			await this._nftMethod.create(
 				context.getMethodContext(),
 				recipient,
-				collectionID,
+				data.collectionID,
 				attributesArray,
 			);
+			const combinedKey = Buffer.concat([recipient, Buffer.from(type)]);
 			const businessStore = this.stores.get(BusinessStore);
-			await businessStore.set(context, recipient, { minted: true });
+			await businessStore.set(context, combinedKey, { minted: true });
 		} catch (e) {
 			console.log('error:', e);
+			throw new Error('Error creating business' + e);
 		}
 
 		const stakeTimeStore = this.stores.get(StakeTimeStore);
@@ -88,6 +98,7 @@ export class CreateFirstBusinessCommand extends Modules.BaseCommand {
 			await this._nftMethod.lock(context, this.name, nftID);
 		} catch (e) {
 			console.log('error:', e);
+			throw new Error('Error creating business' + e);
 		}
 
 		console.log('Pepe business created and locked:', nftID.toString('hex'));

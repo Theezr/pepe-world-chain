@@ -1,6 +1,6 @@
 import { Modules, Types } from 'klayr-sdk';
 import { StakeMethod } from './method';
-import { NftAttributes } from './types';
+import { GetNftData, NftAttributes, nftData, NftType } from './types';
 
 export class StakeEndpoint extends Modules.BaseEndpoint {
 	private method!: StakeMethod;
@@ -30,5 +30,26 @@ export class StakeEndpoint extends Modules.BaseEndpoint {
 		const nft = await this.method.getNft(ctx, Buffer.from(nftID as string, 'hex'));
 		const attributes: NftAttributes = JSON.parse(nft.attributesArray[0].attributes.toString());
 		return this.method.calculateRevenue(attributes);
+	}
+
+	public async getAllNftTypes(_ctx: Types.ModuleEndpointContext): Promise<{
+		[key: string]: GetNftData;
+	}> {
+		const allNftTypes: { [key: string]: GetNftData } = {};
+
+		for (const type in NftType) {
+			if (NftType.hasOwnProperty(type)) {
+				const nftType = NftType[type as keyof typeof NftType];
+				const nftInfo = nftData[nftType];
+				allNftTypes[nftType] = {
+					attributes: nftInfo.attributes,
+					maxRevenue: nftInfo.maxRevenue,
+					baseRevenue: nftInfo.baseRevenue,
+					baseCost: nftInfo.baseCost,
+				};
+			}
+		}
+
+		return allNftTypes;
 	}
 }

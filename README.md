@@ -19,6 +19,8 @@ yarn build && ./bin/run start --config config/custom_config.json --overwrite-con
 
 ```
 ./bin/run transaction:create nftFactory createFirstPepe 10000000 --params='{"amount": "100000000", "recipient": "kly4mba244me87reyg9fegcy2cesdfw6gq9r8we5x"}' --json --pretty --key-derivation-path="m/44'/134'/45'"
+
+./bin/run transaction:create stake createFirstPepe 10000000 --params='{"type": "lemonadStand", "address": "klycjt7kexdqkb3yuezbpb7ba5ozwwnsyw7xggmm4"}' --json --pretty --key-derivation-path="m/44'/134'/45'"
 ```
 
 ### stakePepe
@@ -62,6 +64,7 @@ yarn build && ./bin/run start --config config/custom_config.json --overwrite-con
 ```
 ./bin/run endpoint:invoke stake_getStakeRewardsForNft '{"nftID": "01371337310000000000000000"}'
 ./bin/run endpoint:invoke stake_getUpgradeCost '{"nftID": "01371337000000010000000000000001"}'
+./bin/run endpoint:invoke stake_getAllNftTypes  --json --pretty
 ```
 
 ## Drip Plugin
@@ -69,7 +72,7 @@ yarn build && ./bin/run start --config config/custom_config.json --overwrite-con
 ```
 ./bin/run endpoint:invoke drip_fundTokens '{"address": "klyzrja9we9f2hvtc6uoxtbwutb9b8cqmde8vnfro"}' --pretty
 
-./bin/run endpoint:invoke drip_mintFirstPepeBusiness '{"address": "kly22hwq7ejuopapxz7m8tq6w3aokvmym36vjkjot"}' --pretty
+./bin/run endpoint:invoke drip_mintPepeBusiness '{"address": "klycnpgo6unchuc4cdvetp4nb78ayfhs5d5cfft7b", "type":"lemonadeStand"}' --pretty
 
 ./bin/run endpoint:invoke drip_unstakePepe '{"nftID": "01371337000000010000000000000000"}' --pretty
 ```
@@ -87,7 +90,7 @@ yarn build && ./bin/run start --config config/custom_config.json --overwrite-con
 ```
 ./bin/run endpoint:invoke token_getBalance '{"tokenID": "0137133700000000", "address":"kly22hwq7ejuopapxz7m8tq6w3aokvmym36vjkjot"}' --pretty
 
-./bin/run endpoint:invoke drip_getNftsForAddress '{"address": "kly22hwq7ejuopapxz7m8tq6w3aokvmym36vjkjot"}' --pretty
+./bin/run endpoint:invoke drip_getNftsForAddress '{"address": "klycnpgo6unchuc4cdvetp4nb78ayfhs5d5cfft7b"}' --pretty
 ```
 
 ### Get nft balances

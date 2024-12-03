@@ -47,6 +47,23 @@ export const createFirstSchema = {
 	required: ['recipient'],
 };
 
+export const createBusinessSchema = {
+	$id: 'CreateBusinessCommand',
+	type: 'object',
+	properties: {
+		recipient: {
+			dataType: 'bytes',
+			fieldNumber: 1,
+			format: 'klayr32',
+		},
+		type: {
+			dataType: 'string',
+			fieldNumber: 2,
+		},
+	},
+	required: ['recipient', 'type'],
+};
+
 export const upgradeBusinessSchema = {
 	$id: 'UpgradeBusinessCommand',
 	type: 'object',

@@ -13,7 +13,6 @@ interface Params {
 
 export class UpgradeBusinessCommand extends Modules.BaseCommand {
 	private _method!: StakeMethod;
-	private _tokenMethod!: TokenMethod;
 	private _nftMethod!: NFTMethod;
 
 	public schema = upgradeBusinessSchema;
@@ -25,7 +24,6 @@ export class UpgradeBusinessCommand extends Modules.BaseCommand {
 		nftMethod: NFTMethod;
 	}) {
 		this._method = args.method;
-		this._tokenMethod = args.tokenMethod;
 		this._nftMethod = args.nftMethod;
 	}
 
@@ -39,18 +37,14 @@ export class UpgradeBusinessCommand extends Modules.BaseCommand {
 		if (!nft) {
 			return { status: StateMachine.VerifyStatus.FAIL, error: new Error('NFT not found') };
 		}
-
 		const attributes: NftAttributes = JSON.parse(nft.attributesArray[0].attributes.toString());
-		const fee = this._method.calculateCost(attributes);
 
-		const userBalance = await this._tokenMethod.getAvailableBalance(
+		const hasEnoughBalance = await this._method.checkForBalance(
 			context,
 			nft.owner,
-			this.chainTokenID,
+			attributes.type,
 		);
-		console.log('userBalance:', userBalance);
-
-		if (BigInt(userBalance) < BigInt(fee)) {
+		if (!hasEnoughBalance) {
 			return { status: StateMachine.VerifyStatus.FAIL, error: new Error('Insufficient funds') };
 		}
 
@@ -63,14 +57,13 @@ export class UpgradeBusinessCommand extends Modules.BaseCommand {
 
 		const nft = await this._nftMethod.getNFT(context, nftID);
 		const attributes: NftAttributes = JSON.parse(nft.attributesArray[0].attributes.toString());
-		const fee = this._method.calculateCost(attributes);
+
 		try {
 			await this._method.mintRewardsToUser(context, nftID, currentTime, nft.owner);
 			const stakeTimeStore = this.stores.get(StakeTimeStore);
 			await stakeTimeStore.set(context, nftID, { time: currentTime });
 
-			await this._tokenMethod.initializeUserAccount(context, nft.owner, this.chainTokenID);
-			await this._tokenMethod.burn(context, nft.owner, this.chainTokenID, BigInt(fee));
+			await this._method.burnFeeForRecipient(context, nft.owner, attributes.type);
 		} catch (error) {
 			console.log('Error burning fee:', error);
 			throw new Error('Error burning fee');

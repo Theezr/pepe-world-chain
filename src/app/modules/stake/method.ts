@@ -3,6 +3,7 @@ import { Modules } from 'klayr-sdk';
 import { StakeTimeStore } from './stores/stakeTime';
 import {
 	CommandExecuteContext,
+	CommandVerifyContext,
 	ImmutableMethodContext,
 } from 'klayr-framework/dist-node/state_machine';
 import { NftAttributes, nftData } from './types';
@@ -26,11 +27,10 @@ export class StakeMethod extends Modules.BaseMethod {
 	}
 
 	public calculateRevenue(nftAttributes: NftAttributes): number {
-		const { baseRevenue, maxRevenue } = nftData[nftAttributes.type];
+		const { baseRevenue } = nftData[nftAttributes.type];
 		const { quantity, multiplier = 1 } = nftAttributes;
 		const revenue = baseRevenue * quantity * multiplier;
-		const cappedRevenue = Math.min(revenue, maxRevenue * multiplier);
-		return Math.round(cappedRevenue);
+		return revenue;
 	}
 
 	public getNft(ctx: ImmutableMethodContext, nftID: Buffer) {
@@ -50,11 +50,14 @@ export class StakeMethod extends Modules.BaseMethod {
 
 		const nft = await this._nftMethod.getNFT(ctx, nftID);
 		const attributes = JSON.parse(nft.attributesArray[0].attributes.toString());
+		const { multiplier = 1, type, quantity } = attributes;
+		const { maxRevenue } = nftData[type];
 
 		const revenue = this.calculateRevenue(attributes);
 		console.log({ revenue, timeDiff });
 
-		return timeDiff * revenue;
+		const cappedRevenue = Math.min(timeDiff * revenue, maxRevenue * quantity * multiplier);
+		return Math.round(cappedRevenue);
 	}
 
 	public async mintRewardsToUser(
@@ -70,5 +73,54 @@ export class StakeMethod extends Modules.BaseMethod {
 		await this._tokenMethod.mint(ctx, userAddress, stakeRewardToken, BigInt(rewards));
 
 		console.log(`minted ${rewards}`);
+	}
+
+	public async checkForBalance(
+		ctx: CommandVerifyContext<any>,
+		userAddress: Buffer,
+		type: string,
+	): Promise<boolean> {
+		const attributes: NftAttributes = JSON.parse(
+			this.createAttributeArray(nftData[type])[0].attributes.toString(),
+		);
+		const fee = this.calculateCost(attributes);
+
+		const userBalance = await this._tokenMethod.getAvailableBalance(
+			ctx,
+			userAddress,
+			stakeRewardToken,
+		);
+
+		return BigInt(userBalance) > BigInt(fee);
+	}
+
+	public async burnFeeForRecipient(
+		ctx: CommandExecuteContext<any>,
+		userAddress: Buffer,
+		type: string,
+	): Promise<void> {
+		const attributes: NftAttributes = JSON.parse(
+			this.createAttributeArray(nftData[type])[0].attributes.toString(),
+		);
+		const fee = this.calculateCost(attributes);
+
+		await this._tokenMethod.initializeUserAccount(ctx, userAddress, stakeRewardToken);
+		await this._tokenMethod.burn(ctx, userAddress, stakeRewardToken, BigInt(fee));
+	}
+
+	public createAttributeArray(nftData: any) {
+		return [
+			{
+				module: nftData.module,
+				attributes: Buffer.from(
+					JSON.stringify({
+						name: nftData.attributes.name,
+						type: nftData.attributes.type,
+						imageUrl: nftData.attributes.imageUrl,
+						quantity: nftData.attributes.quantity,
+					}),
+				),
+			},
+		];
 	}
 }
