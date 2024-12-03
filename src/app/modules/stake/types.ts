@@ -1,18 +1,16 @@
-export interface DripPluginConfig {
-	port: number;
-	host: string;
-	encryptedPrivateKey: string;
-	tokenID: string;
-	applicationUrl: string;
-	fee: string;
-	amount: string;
-	tokenPrefix: string;
+export interface NftAttributes {
+	name: string;
+	imageUrl: string;
+	type: string;
+	quantity: number;
+	multiplier?: number;
 }
 
-export interface State {
-	publicKey?: Buffer;
-	privateKey?: Buffer;
-	address?: string;
+export interface GetNftData {
+	attributes: NftAttributes;
+	maxRevenue: number;
+	baseRevenue: number;
+	baseCost: number;
 }
 
 export enum NftType {
@@ -35,7 +33,7 @@ export const nftData = {
 		attributes: {
 			name: 'Lemonade Stand',
 			type: NftType.LemonadeStand,
-			imageUrl: 'https://example.com/image.png',
+			imageUrl: '/assets/pepe-lemonade.jpg',
 			quantity: 1,
 		},
 	},
@@ -50,7 +48,7 @@ export const nftData = {
 		attributes: {
 			name: 'Coffee Shop',
 			type: NftType.CoffeeShop,
-			imageUrl: 'https://example.com/image.png',
+			imageUrl: '/assets/pepe-coffeeshop.jpg',
 			quantity: 1,
 		},
 	},
@@ -65,7 +63,7 @@ export const nftData = {
 		attributes: {
 			name: 'Pizza Parlor',
 			type: NftType.PizzaParlor,
-			imageUrl: 'https://example.com/image.png',
+			imageUrl: '/assets/pepe-pizzaparlor.jpg',
 			quantity: 1,
 		},
 	},
@@ -80,7 +78,7 @@ export const nftData = {
 		attributes: {
 			name: 'Burger Joint',
 			type: NftType.BurgerJoint,
-			imageUrl: 'https://example.com/image.png',
+			imageUrl: '/assets/pepe-burgerjoint.jpg',
 			quantity: 1,
 		},
 	},
@@ -95,7 +93,7 @@ export const nftData = {
 		attributes: {
 			name: 'Sushi Bar',
 			type: NftType.SushiBar,
-			imageUrl: 'https://example.com/image.png',
+			imageUrl: '/assets/pepe-sushibar.jpg',
 			quantity: 1,
 		},
 	},

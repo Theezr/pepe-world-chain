@@ -20,7 +20,7 @@ export const mintSchema = {
 	},
 	required: ['tokenID', 'amount', 'recipient'],
 };
-1;
+
 export const createNftSchema = {
 	$id: 'CreateNftCommand',
 	type: 'object',

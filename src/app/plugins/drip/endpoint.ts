@@ -13,185 +13,230 @@
  */
 
 import { Plugins, Types, cryptography, validator as klayrvalidator, transactions } from 'klayr-sdk';
-import { authorizeParamsSchema, fundParamsSchema, getNftsParamsSchema } from './schemas';
-import { DripPluginConfig, State } from './types';
-import { LENGTH_COLLECTION_ID } from 'klayr-framework/dist-node/modules/nft/constants';
-import { utils } from '@klayr/cryptography';
+import { authorizeParamsSchema, claimRevenueSchema, getNftsParamsSchema } from './schemas';
+import { DripPluginConfig, nftData, State } from './types';
+
+import { decodeAttributes, isValidNftType } from './helpers';
 
 // disabled for type annotation
 // eslint-disable-next-line prefer-destructuring
 const validator: klayrvalidator.KlayrValidator = klayrvalidator.validator;
+const pepeTokenID = '0137133700000000';
+
+interface ReturnType {
+	command: string;
+	address: string;
+	message: string;
+}
+
+interface SendTransactionParams {
+	context: Types.PluginEndpointContext;
+	module: string;
+	command: string;
+	params: Record<string, unknown>;
+	successMessage: string;
+}
 
 export class Endpoint extends Plugins.BasePluginEndpoint {
 	private _state: State = { publicKey: undefined, privateKey: undefined, address: undefined };
 	private _client!: Plugins.BasePlugin['apiClient'];
 	private _config!: DripPluginConfig;
-	private nonce: string = '';
+	// private nonce: string = '';
 
 	public init(state: State, apiClient: Plugins.BasePlugin['apiClient'], config: DripPluginConfig) {
 		this._state = state;
 		this._client = apiClient;
 		this._config = config;
 	}
+
 	// eslint-disable-next-line @typescript-eslint/require-await
 
-	public async fundTokens(context: Types.PluginEndpointContext): Promise<{ result: string }> {
-		validator.validate(fundParamsSchema, context.params);
-		const { address } = context.params;
-
+	private async _sendTransaction({
+		context,
+		module,
+		command,
+		params,
+		successMessage,
+	}: SendTransactionParams): Promise<ReturnType> {
+		context.logger.info('your log');
+		console.log({ params });
 		if (!this._state.publicKey || !this._state.privateKey) {
 			throw new Error('Faucet is not enabled.');
 		}
 
-		await this._transferFunds(address as string);
-
-		return {
-			result: `Successfully funded account at address: ${address as string}`,
-		};
-	}
-
-	private async _transferFunds(address: string): Promise<void> {
-		// const mintParams = {
-		// 	tokenID: this._config.tokenID,
-		// 	amount: '1',
-		// 	recipient: address,
-		// 	data: '',
-		// };
-
-		const mintNft = {
-			// tokenID: this._config.tokenID,
-			// amount: transactions.convertklyToBeddows(this._config.amount),
-			address: address,
-			collectionID: utils.getRandomBytes(LENGTH_COLLECTION_ID),
-			attributesArray: [
-				{
-					module: 'mint',
-					attributes: Buffer.from(
-						JSON.stringify({
-							level: 2,
-							txpersec: 10,
-							etc: 'heelTest2',
-						}),
-					),
-				},
-			],
-		};
-
-		// const upgradeNft = {
-		// 	nftID: '01371337e7197bfc0000000000000000',
-		// 	module: 'mint',
-		// 	attributes: Buffer.from('22'),
-		// };
-
-		console.log('transferTransactionParams:', mintNft);
-
 		const transaction = await this._client.transaction.create(
 			{
-				module: 'mint',
-				command: 'createNft',
+				module,
+				command,
 				senderPublicKey: this._state.publicKey?.toString('hex'),
 				fee: transactions.convertklyToBeddows(this._config.fee),
-				params: mintNft,
-				nonce: this.nonce,
+				params,
+				// nonce: this.nonce,
 			},
 			this._state.privateKey?.toString('hex') as string,
 		);
 
-		this.nonce = (parseInt(this.nonce) + 1).toString();
+		// this.nonce = (parseInt(this.nonce) + 1).toString();
+		console.log('before sent');
+		try {
+			await this._client.transaction.send(transaction);
+		} catch (error) {
+			console.log('error:', error);
+			throw new Error(`Error Sending TX ${command} ${error}`);
+		}
 
-		await this._client.transaction.send(transaction);
+		return {
+			command: command,
+			address: (context.params.address as string) || '',
+			message: successMessage,
+		};
 	}
 
-	public async mintDustGeneratorNft(
-		context: Types.PluginEndpointContext,
-	): Promise<{ result: any }> {
+	public async mintPepeBusiness(context: Types.PluginEndpointContext): Promise<ReturnType> {
+		validator.validate(getNftsParamsSchema, context.params);
+		const { address, type } = context.params;
+
+		if (!isValidNftType(type as string)) {
+			throw new Error('Invalid business type');
+		}
+
+		return this._sendTransaction({
+			context,
+			module: 'stake',
+			command: 'createFirstBusiness',
+			params: { recipient: address, type },
+			successMessage: 'Successfully created pepe business tx',
+		});
+	}
+
+	public async mintFirstPepeWorker(context: Types.PluginEndpointContext): Promise<ReturnType> {
 		validator.validate(getNftsParamsSchema, context.params);
 		const { address } = context.params;
 
-		// CHECK IF ACCOUNT ALREADY HAS DUST GENRRATOR NEFT
-
-		if (!this._state.publicKey || !this._state.privateKey) {
-			throw new Error('Faucet is not enabled.');
-		}
-		const FIXED_COLLECTION_ID = '01234567';
-
-		const mintNft = {
-			address: address,
-			collectionID: FIXED_COLLECTION_ID,
-			attributesArray: [
-				{
-					module: 'stats',
-					attributes: Buffer.from(
-						JSON.stringify({
-							dustPerSecond: 20,
-							multiplier: 1,
-							dustCap: 300,
-							level: 2,
-							rarity: 'common',
-						}),
-					),
-				},
-			],
-		};
-
-		const transaction = await this._client.transaction.create(
-			{
-				module: 'mint',
-				command: 'createNft',
-				senderPublicKey: this._state.publicKey?.toString('hex'),
-				fee: transactions.convertklyToBeddows(this._config.fee),
-				params: mintNft,
-				nonce: this.nonce,
-			},
-			this._state.privateKey?.toString('hex') as string,
-		);
-
-		this.nonce = (parseInt(this.nonce) + 1).toString();
-		await this._client.transaction.send(transaction);
-
-		return {
-			result: `Successfully funded account at address: ${address as string}`,
-		};
+		return this._sendTransaction({
+			context,
+			module: 'stake',
+			command: 'createFirstPepe',
+			params: { recipient: address },
+			successMessage: 'Successfully created pepe worker tx',
+		});
 	}
 
-	public async getNftsForAddress(context: Types.PluginEndpointContext): Promise<{ nfts: any }> {
+	public async claimRevenue(context: Types.PluginEndpointContext): Promise<ReturnType> {
+		validator.validate(claimRevenueSchema, context.params);
+		const { nftID } = context.params;
+
+		return this._sendTransaction({
+			context,
+			module: 'stake',
+			command: 'claimRewards',
+			params: { nftID },
+			successMessage: 'Successfully claimed revenue',
+		});
+	}
+
+	public async unstakePepe(context: Types.PluginEndpointContext): Promise<ReturnType> {
+		validator.validate(claimRevenueSchema, context.params);
+		const { nftID } = context.params;
+
+		return this._sendTransaction({
+			context,
+			module: 'stake',
+			command: 'unstakePepe',
+			params: { nftID },
+			successMessage: 'Successfully unstaked pepe',
+		});
+	}
+
+	public async stakePepe(context: Types.PluginEndpointContext): Promise<ReturnType> {
+		validator.validate(claimRevenueSchema, context.params);
+		const { nftID } = context.params;
+
+		return this._sendTransaction({
+			context,
+			module: 'stake',
+			command: 'stakePepe',
+			params: { nftID },
+			successMessage: 'Successfully staked pepe',
+		});
+	}
+
+	public async upgradeBusiness(context: Types.PluginEndpointContext): Promise<ReturnType> {
+		validator.validate(claimRevenueSchema, context.params);
+		const { nftID } = context.params;
+
+		return this._sendTransaction({
+			context,
+			module: 'stake',
+			command: 'upgradeBusiness',
+			params: { nftID },
+			successMessage: 'Successfully upgraded business',
+		});
+	}
+
+	public async getNftsForAddress(
+		context: Types.PluginEndpointContext,
+	): Promise<{ command: string; workers: any; businesses: any; tokens: any }> {
 		validator.validate(getNftsParamsSchema, context.params);
 		const { address } = context.params;
 
 		const nfts = await this._client.invoke('nft_getNFTs', {
 			address,
 		});
-		const nftArray = nfts.nfts as any[];
-
-		const decodedNfts = nftArray.map(nft => {
-			const decodedAttributesArray = nft.attributesArray.map(attribute => {
-				return {
-					...attribute,
-					attributes: this._decodeAttributes(attribute.attributes),
-				};
-			});
-
-			return {
-				...nft,
-				attributesArray: decodedAttributesArray,
-			};
+		const tokenBalance = await this._client.invoke('token_getBalance', {
+			address,
+			tokenID: pepeTokenID,
 		});
 
-		console.log(decodedNfts);
+		const nftArray = nfts.nfts as any[];
+
+		const decodedNfts = await Promise.all(
+			nftArray.map(async nft => {
+				const decodedAttributesArray = nft.attributesArray.map(attribute => {
+					const decodedAttributes = decodeAttributes(attribute.attributes);
+					return {
+						...attribute,
+						attributes: decodedAttributes,
+					};
+				});
+
+				let unclaimedRevenue = 0;
+				let upgradeCost = 0;
+				if (decodedAttributesArray[0].module === 'business') {
+					unclaimedRevenue = await this._client.invoke('stake_getStakeRewardsForNft', {
+						nftID: nft.id,
+					});
+					upgradeCost = await this._client.invoke('stake_getUpgradeCost', {
+						nftID: nft.id,
+					});
+				}
+				const nftDefaults = nftData[decodedAttributesArray[0].attributes.type];
+				const maxRevenue = nftDefaults?.maxRevenue ?? 0;
+
+				return {
+					...nft,
+					attributesArray: decodedAttributesArray,
+					maxRevenue: maxRevenue * decodedAttributesArray[0].attributes.quantity,
+					baseRevenue: nftDefaults?.baseRevenue ?? 0,
+					upgradeCost,
+					unclaimedRevenue,
+				};
+			}),
+		);
+
+		const workers = decodedNfts.filter(nft => nft.attributesArray[0].module === 'worker');
+		const businesses = decodedNfts.filter(nft => nft.attributesArray[0].module === 'business');
+
+		console.log('Worker NFTs:', workers);
+		console.log('Business NFTs:', businesses);
 
 		return {
-			nfts: decodedNfts,
+			command: 'nfts',
+			workers,
+			businesses,
+			tokens: tokenBalance,
 		};
 	}
-
-	private _decodeAttributes = (hexString: string) => {
-		if (!hexString) return {};
-
-		const buffer = Buffer.from(hexString, 'hex');
-		const jsonString = buffer.toString('utf8');
-		const attributes = JSON.parse(jsonString);
-		return attributes;
-	};
 
 	public async authorize(context: Types.PluginEndpointContext): Promise<{ result: string }> {
 		validator.validate<{ enable: boolean; password: string }>(
@@ -222,12 +267,12 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 				: undefined;
 			const changedState = enable ? 'enabled' : 'disabled';
 
-			const account = await this._client.invoke('auth_getAuthAccount', {
-				address: this._state.address,
-			});
+			// const account = await this._client.invoke('auth_getAuthAccount', {
+			// 	address: this._state.address,
+			// });
 
-			console.log('nonce:', account);
-			this.nonce = account.nonce as string;
+			// console.log('nonce:', account);
+			// this.nonce = account.nonce as string;
 
 			return {
 				result: `Successfully ${changedState} the dripper.`,

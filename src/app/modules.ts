@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
+import { NFTModule } from 'klayr-framework/dist-node/modules/nft';
 import { Application, Modules } from 'klayr-sdk';
 import { MintModule } from './modules/mint/module';
-import { NFTModule } from 'klayr-framework/dist-node/modules/nft';
+import { StakeModule } from './modules/stake/module';
 
 interface KlayrMethod {
 	validator: Modules.Validators.ValidatorsMethod;
@@ -20,9 +21,14 @@ export const registerModules = (app: Application, method: KlayrMethod): void => 
 	const mintModule = new MintModule();
 	const nftModule = new NFTModule();
 
+	const stakeModule = new StakeModule();
+
 	mintModule.addDependencies({ tokenMethod: method.token, nftMethod: nftModule.method });
 	nftModule.addDependencies(method.interoperability, method.fee, method.token);
 
+	stakeModule.addDependencies({ tokenMethod: method.token, nftMethod: nftModule.method });
+
 	app.registerModule(mintModule);
 	app.registerModule(nftModule);
+	app.registerModule(stakeModule);
 };
