@@ -202,11 +202,16 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 
 				let unclaimedRevenue = 0;
 				let upgradeCost = 0;
+				let revenue = 0;
 				if (decodedAttributesArray[0].module === 'business') {
 					unclaimedRevenue = await this._client.invoke('stake_getStakeRewardsForNft', {
 						nftID: nft.id,
 					});
 					upgradeCost = await this._client.invoke('stake_getUpgradeCost', {
+						nftID: nft.id,
+					});
+
+					revenue = await this._client.invoke('stake_getRevenue', {
 						nftID: nft.id,
 					});
 				}
@@ -217,9 +222,10 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 					...nft,
 					attributesArray: decodedAttributesArray,
 					maxRevenue: maxRevenue * decodedAttributesArray[0].attributes.quantity,
-					baseRevenue: nftDefaults?.baseRevenue ?? 0,
+					baseRevenue: revenue,
 					upgradeCost,
 					unclaimedRevenue,
+					typeMultiplier: nftDefaults?.typeMultiplier ?? 1,
 				};
 			}),
 		);

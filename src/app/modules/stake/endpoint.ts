@@ -49,6 +49,7 @@ export class StakeEndpoint extends Modules.BaseEndpoint {
 					maxRevenue: nftInfo.maxRevenue,
 					baseRevenue: nftInfo.baseRevenue,
 					baseCost: this.method.calculateCost(attributes),
+					typeMultiplier: nftInfo.typeMultiplier,
 				};
 			}
 		}
