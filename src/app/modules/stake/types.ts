@@ -11,6 +11,7 @@ export interface GetNftData {
 	maxRevenue: number;
 	baseRevenue: number;
 	baseCost: number;
+	typeMultiplier: number;
 }
 
 export enum NftType {
@@ -24,7 +25,7 @@ export enum NftType {
 export const nftData = {
 	[NftType.LemonadeStand]: {
 		baseCost: 100,
-		growthRate: 0.1,
+		growthRate: 0.2,
 		typeMultiplier: 1.0,
 		baseRevenue: 1,
 		maxRevenue: 1_000,
@@ -39,9 +40,9 @@ export const nftData = {
 	},
 	[NftType.CoffeeShop]: {
 		baseCost: 1_000,
-		growthRate: 0.15,
-		typeMultiplier: 1.5,
-		baseRevenue: 5,
+		growthRate: 0.25,
+		typeMultiplier: 1.2,
+		baseRevenue: 3,
 		maxRevenue: 7_000,
 		collectionID: Buffer.from('00000002', 'hex'),
 		module: 'business',
@@ -53,10 +54,10 @@ export const nftData = {
 		},
 	},
 	[NftType.PizzaParlor]: {
-		baseCost: 5_000,
-		growthRate: 0.2,
-		typeMultiplier: 2.0,
-		baseRevenue: 10,
+		baseCost: 4_000,
+		growthRate: 0.35,
+		typeMultiplier: 1.5,
+		baseRevenue: 7,
 		maxRevenue: 10_000,
 		collectionID: Buffer.from('00000003', 'hex'),
 		module: 'business',
@@ -69,9 +70,9 @@ export const nftData = {
 	},
 	[NftType.BurgerJoint]: {
 		baseCost: 10_000,
-		growthRate: 0.25,
-		typeMultiplier: 2.5,
-		baseRevenue: 20,
+		growthRate: 0.5,
+		typeMultiplier: 1.8,
+		baseRevenue: 12,
 		maxRevenue: 15_000,
 		collectionID: Buffer.from('00000004', 'hex'),
 		module: 'business',
@@ -84,9 +85,9 @@ export const nftData = {
 	},
 	[NftType.SushiBar]: {
 		baseCost: 20_000,
-		growthRate: 0.3,
-		typeMultiplier: 3.0,
-		baseRevenue: 30,
+		growthRate: 0.8,
+		typeMultiplier: 2.5,
+		baseRevenue: 20,
 		maxRevenue: 20_000,
 		collectionID: Buffer.from('00000005', 'hex'),
 		module: 'business',

@@ -27,9 +27,9 @@ export class StakeMethod extends Modules.BaseMethod {
 	}
 
 	public calculateRevenue(nftAttributes: NftAttributes): number {
-		const { baseRevenue } = nftData[nftAttributes.type];
+		const { baseRevenue, typeMultiplier } = nftData[nftAttributes.type];
 		const { quantity, multiplier = 1 } = nftAttributes;
-		const revenue = baseRevenue * quantity * multiplier;
+		const revenue = baseRevenue * quantity * multiplier * typeMultiplier;
 		return revenue;
 	}
 
