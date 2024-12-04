@@ -41,11 +41,14 @@ export class StakeEndpoint extends Modules.BaseEndpoint {
 			if (NftType.hasOwnProperty(type)) {
 				const nftType = NftType[type as keyof typeof NftType];
 				const nftInfo = nftData[nftType];
+				const attributes: NftAttributes = JSON.parse(
+					this.method.createAttributeArray(nftInfo)[0].attributes.toString(),
+				);
 				allNftTypes[nftType] = {
 					attributes: nftInfo.attributes,
 					maxRevenue: nftInfo.maxRevenue,
 					baseRevenue: nftInfo.baseRevenue,
-					baseCost: nftInfo.baseCost,
+					baseCost: this.method.calculateCost(attributes),
 				};
 			}
 		}
