@@ -28,7 +28,7 @@ export const nftData = {
 		growthRate: 0.2,
 		typeMultiplier: 1.0,
 		baseRevenue: 1,
-		maxRevenue: 1_000,
+		maxRevenue: 2_000,
 		collectionID: Buffer.from('00000001', 'hex'),
 		module: 'business',
 		attributes: {
@@ -43,7 +43,7 @@ export const nftData = {
 		growthRate: 0.25,
 		typeMultiplier: 1.2,
 		baseRevenue: 3,
-		maxRevenue: 7_000,
+		maxRevenue: 10_000,
 		collectionID: Buffer.from('00000002', 'hex'),
 		module: 'business',
 		attributes: {
@@ -58,7 +58,7 @@ export const nftData = {
 		growthRate: 0.35,
 		typeMultiplier: 1.5,
 		baseRevenue: 7,
-		maxRevenue: 10_000,
+		maxRevenue: 20_000,
 		collectionID: Buffer.from('00000003', 'hex'),
 		module: 'business',
 		attributes: {
@@ -73,7 +73,7 @@ export const nftData = {
 		growthRate: 0.5,
 		typeMultiplier: 1.8,
 		baseRevenue: 12,
-		maxRevenue: 15_000,
+		maxRevenue: 35_000,
 		collectionID: Buffer.from('00000004', 'hex'),
 		module: 'business',
 		attributes: {
@@ -88,7 +88,7 @@ export const nftData = {
 		growthRate: 0.8,
 		typeMultiplier: 2.5,
 		baseRevenue: 20,
-		maxRevenue: 20_000,
+		maxRevenue: 60_000,
 		collectionID: Buffer.from('00000005', 'hex'),
 		module: 'business',
 		attributes: {
