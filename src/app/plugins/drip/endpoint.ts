@@ -333,11 +333,16 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 			address,
 		});
 
+		const nextLevelMultipliers = await this._client.invoke('stake_getNewMultipliers', {
+			nftID: nft.id,
+		});
+
 		return {
 			...nft,
 			attributesArray: decodedAttributesArray,
 			experienceToNextLevel,
 			experience: experienceStakedWorker,
+			nextLevelMultipliers,
 		};
 	}
 }

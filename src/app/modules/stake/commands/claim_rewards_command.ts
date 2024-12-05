@@ -60,12 +60,12 @@ export class ClaimRewardsCommand extends Modules.BaseCommand {
 		const currentTime = context.header.timestamp;
 
 		const nft = await this._nftMethod.getNFT(context, nftID);
-		// TODO: multiply by worker multipliers
 		const rewards = await this._method.mintRewardsToUser(context, nftID, currentTime, nft.owner);
 
 		const stakeTimeStore = this.stores.get(StakeTimeStore);
 		await stakeTimeStore.set(context, nftID, { time: context.header.timestamp });
 
+		// TODO: double code in upgrade business
 		const workerStakedStore = this.stores.get(WorkerStakedStore);
 		const address = Buffer.from(cryptography.address.getKlayr32AddressFromAddress(nft.owner));
 
@@ -79,9 +79,13 @@ export class ClaimRewardsCommand extends Modules.BaseCommand {
 
 			const newExperience = workerStaked.experience + rewards;
 			const experience = newExperience >= experienceNeeded ? experienceNeeded : newExperience;
-			console.log({ experience, newExperience, experienceNeeded });
 
-			await workerStakedStore.set(context, address, { nftID, experience });
+			await workerStakedStore.set(context, address, {
+				nftID: workerStaked.nftID,
+				experience,
+				capMultiplier: workerStaked.capMultiplier,
+				revMultiplier: workerStaked.revMultiplier,
+			});
 		}
 	}
 }

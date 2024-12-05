@@ -1,7 +1,7 @@
 import { Modules, Types } from 'klayr-sdk';
 import { StakeMethod } from './method';
-import { GetBusinessData, BusinessAttributes, WorkerAttributes } from './types';
-import { businessData, BusinessType } from '../../nftTypes';
+import { GetBusinessData, BusinessAttributes, WorkerAttributes, GetWorkerData } from './types';
+import { businessData, BusinessType, workerData, WorkerType } from '../../nftTypes';
 import { WorkerStakedStore } from './stores/workerStakedStore';
 
 export class StakeEndpoint extends Modules.BaseEndpoint {
@@ -55,10 +55,7 @@ export class StakeEndpoint extends Modules.BaseEndpoint {
 		const { address } = ctx.params;
 		const workerStakedStore = this.stores.get(WorkerStakedStore);
 		try {
-			//recipient: <Buffer a7 56 cd a2 86 6f 2d aa 01 54 a4 07 29 49 ae 4c 3b 04 5f 6a>,
-			console.log({ address });
 			const addressBuffer = Buffer.from(address as string);
-			console.log(addressBuffer);
 			const workerStaked = await workerStakedStore.get(ctx, addressBuffer);
 
 			return workerStaked.experience.toString();
@@ -90,5 +87,29 @@ export class StakeEndpoint extends Modules.BaseEndpoint {
 		}
 
 		return allNftTypes;
+	}
+
+	public async getAllWorkerTypes(_ctx: Types.ModuleEndpointContext): Promise<{
+		[key: string]: GetWorkerData;
+	}> {
+		const allWorkerTypes: { [key: string]: GetWorkerData } = {};
+
+		for (const type in WorkerType) {
+			if (WorkerType.hasOwnProperty(type)) {
+				const workerType = WorkerType[type as keyof typeof WorkerType];
+				const workerInfo = workerData[workerType];
+
+				allWorkerTypes[workerType] = {
+					attributes: workerInfo.attributes,
+					baseCost: workerInfo.baseCost,
+					growthRate: workerInfo.growthRate,
+					typeMultiplier: workerInfo.typeMultiplier,
+					baseExperience: workerInfo.baseExperience,
+					multiplierGrowthRate: workerInfo.multiplierGrowthRate,
+				};
+			}
+		}
+
+		return allWorkerTypes;
 	}
 }

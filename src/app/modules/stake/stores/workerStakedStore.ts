@@ -3,12 +3,14 @@ import { Modules } from 'klayr-sdk';
 export interface WorkerStakedData {
 	nftID: Buffer;
 	experience: bigint;
+	revMultiplier: string;
+	capMultiplier: string;
 }
 
 export const workerStakedSchema = {
 	$id: '/stake/workerStaked',
 	type: 'object',
-	required: ['nftID', 'experience'],
+	required: ['nftID', 'experience', 'revMultiplier', 'capMultiplier'],
 	properties: {
 		nftID: {
 			dataType: 'bytes',
@@ -17,6 +19,14 @@ export const workerStakedSchema = {
 		experience: {
 			dataType: 'uint64',
 			fieldNumber: 2,
+		},
+		revMultiplier: {
+			dataType: 'string',
+			fieldNumber: 3,
+		},
+		capMultiplier: {
+			dataType: 'string',
+			fieldNumber: 4,
 		},
 	},
 };

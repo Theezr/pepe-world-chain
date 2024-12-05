@@ -30,6 +30,6 @@ export interface GetWorkerData {
 	typeMultiplier: number;
 	multiplierGrowthRate: number;
 	baseExperience: number;
-	totalExperience: number;
-	experienceToNextLevel: number;
+	totalExperience?: number;
+	experienceToNextLevel?: number;
 }

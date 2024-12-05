@@ -86,7 +86,12 @@ export class CreateFirstPepeCommand extends Modules.BaseCommand {
 
 			const address = cryptography.address.getKlayr32AddressFromAddress(recipient);
 			const workerStakedStore = this.stores.get(WorkerStakedStore);
-			await workerStakedStore.set(context, Buffer.from(address), { nftID, experience: BigInt(0) });
+			await workerStakedStore.set(context, Buffer.from(address), {
+				nftID,
+				experience: BigInt(0),
+				revMultiplier: attributes.revMultiplier.toString(),
+				capMultiplier: attributes.capMultiplier.toString(),
+			});
 		} catch (e) {
 			console.log('error creating worker:', e);
 			throw e;

@@ -72,16 +72,9 @@ export class StakeMethod extends Modules.BaseMethod {
 		const hasWorkerStaked = await workerStakedStore.has(ctx, address);
 		if (hasWorkerStaked) {
 			const stakedWorker = await workerStakedStore.get(ctx, address);
-			console.log({ stakedWorker });
-			const workerNft = await this.getNft(ctx, stakedWorker.nftID);
-			console.log({ workerNft });
-			const workerAttributes: WorkerAttributes = JSON.parse(
-				workerNft.attributesArray[0].attributes.toString(),
-			);
-			console.log({ workerAttributes });
-			workerMultiplier = workerAttributes.revMultiplier;
+			const revMultiplier = stakedWorker?.revMultiplier ?? 1;
+			workerMultiplier = Number(revMultiplier);
 		}
-		console.log({ workerMultiplier });
 
 		const revenue = baseRevenue * quantity * multiplier * typeMultiplier * workerMultiplier;
 		return revenue;
@@ -105,11 +98,26 @@ export class StakeMethod extends Modules.BaseMethod {
 		const nft = await this._nftMethod.getNFT(ctx, nftID);
 		const attributes = JSON.parse(nft.attributesArray[0].attributes.toString());
 		const { multiplier = 1, type, quantity } = attributes;
+
 		const { maxRevenue } = businessData[type];
+		const workerStakedStore = this.stores.get(WorkerStakedStore);
+		const address = Buffer.from(cryptography.address.getKlayr32AddressFromAddress(nft.owner));
+
+		let capMultiplier = 1;
+		const hasWorkerStaked = await workerStakedStore.has(ctx, address);
+		if (hasWorkerStaked) {
+			const stakedWorker = await workerStakedStore.get(ctx, address);
+			const caMultiplier = stakedWorker?.capMultiplier ?? 1;
+
+			capMultiplier = Number(caMultiplier);
+		}
 
 		const revenue = await this.calculateRevenue(ctx, nft, attributes);
 
-		const cappedRevenue = Math.min(timeDiff * revenue, maxRevenue * quantity * multiplier);
+		const cappedRevenue = Math.min(
+			timeDiff * revenue,
+			maxRevenue * capMultiplier * quantity * multiplier,
+		);
 		return Math.round(cappedRevenue);
 	}
 

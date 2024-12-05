@@ -70,7 +70,12 @@ export class LevelWorkerCommand extends Modules.BaseCommand {
 			const workerStakedStore = this.stores.get(WorkerStakedStore);
 			const address = Buffer.from(cryptography.address.getKlayr32AddressFromAddress(nft.owner));
 
-			await workerStakedStore.set(context, address, { nftID, experience: BigInt(0) });
+			await workerStakedStore.set(context, address, {
+				nftID,
+				experience: BigInt(0),
+				revMultiplier: newMultipliers.newRevMultiplier.toString(),
+				capMultiplier: newMultipliers.newCapMultiplier.toString(),
+			});
 		} catch (error) {
 			console.log('Error setting attributes:', error);
 			throw new Error('Error setting attributes');

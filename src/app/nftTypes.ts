@@ -9,7 +9,7 @@ export enum BusinessType {
 export enum WorkerType {
 	ScuffedPimp = 'scuffedPimp',
 	NormiePimp = 'normiePimp',
-	HipsterPimp = 'hipsterPimp',
+	// HipsterPimp = 'hipsterPimp',
 }
 
 export const workerData = {
@@ -18,7 +18,7 @@ export const workerData = {
 		growthRate: 0.2,
 		typeMultiplier: 1.0,
 		baseExperience: 100,
-		multiplierGrowthRate: 0.1,
+		multiplierGrowthRate: 0.05,
 		collectionID: Buffer.from('10000000', 'hex'),
 		module: 'worker',
 		attributes: {
@@ -81,7 +81,7 @@ export const businessData = {
 		},
 	},
 	[BusinessType.PizzaParlor]: {
-		baseCost: 4_000,
+		baseCost: 20_000,
 		growthRate: 0.35,
 		typeMultiplier: 1.5,
 		baseRevenue: 7,
@@ -96,7 +96,7 @@ export const businessData = {
 		},
 	},
 	[BusinessType.BurgerJoint]: {
-		baseCost: 10_000,
+		baseCost: 100_000,
 		growthRate: 0.5,
 		typeMultiplier: 1.8,
 		baseRevenue: 12,
@@ -111,7 +111,7 @@ export const businessData = {
 		},
 	},
 	[BusinessType.SushiBar]: {
-		baseCost: 20_000,
+		baseCost: 200_000,
 		growthRate: 0.8,
 		typeMultiplier: 2.5,
 		baseRevenue: 20,
