@@ -31,14 +31,14 @@ export class StakeEndpoint extends Modules.BaseEndpoint {
 		const { nftID } = ctx.params;
 		const nft = await this.method.getNft(ctx, Buffer.from(nftID as string, 'hex'));
 		const attributes: BusinessAttributes = JSON.parse(nft.attributesArray[0].attributes.toString());
-		return this.method.calculateRevenue(attributes);
+		return this.method.calculateRevenue(ctx, nft, attributes);
 	}
 
-	public async getExperienceToNextLevel(ctx: Types.ModuleEndpointContext): Promise<number> {
+	public async getExperienceToNextLevel(ctx: Types.ModuleEndpointContext): Promise<string> {
 		const { nftID } = ctx.params;
 		const nft = await this.method.getNft(ctx, Buffer.from(nftID as string, 'hex'));
 		const attributes: WorkerAttributes = JSON.parse(nft.attributesArray[0].attributes.toString());
-		return this.method.calculateExperienceToNextLevel(attributes);
+		return this.method.calculateExperienceToNextLevel(attributes).toString();
 	}
 
 	public async getNewMultipliers(ctx: Types.ModuleEndpointContext): Promise<{

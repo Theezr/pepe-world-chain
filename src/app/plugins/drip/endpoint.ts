@@ -180,6 +180,19 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 		});
 	}
 
+	public async levelUpWorker(context: Types.PluginEndpointContext): Promise<ReturnType> {
+		validator.validate(claimRevenueSchema, context.params);
+		const { nftID } = context.params;
+
+		return this._sendTransaction({
+			context,
+			module: 'stake',
+			command: 'levelWorker',
+			params: { nftID },
+			successMessage: 'Successfully leveled worker',
+		});
+	}
+
 	public async getNftsForAddress(
 		context: Types.PluginEndpointContext,
 	): Promise<{ command: string; workers: any; businesses: any; tokens: any }> {

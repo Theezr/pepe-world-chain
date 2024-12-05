@@ -1,5 +1,5 @@
 import { NFTMethod } from 'klayr-framework/dist-node/modules/nft';
-import { Modules } from 'klayr-sdk';
+import { cryptography, Modules } from 'klayr-sdk';
 import { StakeTimeStore } from './stores/stakeTime';
 import {
 	CommandExecuteContext,
@@ -8,6 +8,7 @@ import {
 } from 'klayr-framework/dist-node/state_machine';
 import { BusinessAttributes, WorkerAttributes } from './types';
 import { businessData, workerData } from '../../nftTypes';
+import { WorkerStakedStore } from './stores/workerStakedStore';
 
 const stakeRewardToken = Buffer.from('0137133700000000', 'hex');
 
@@ -20,12 +21,12 @@ export class StakeMethod extends Modules.BaseMethod {
 		this._tokenMethod = args.tokenMethod;
 	}
 
-	public calculateExperienceToNextLevel(workerAttributes: WorkerAttributes): number {
+	public calculateExperienceToNextLevel(workerAttributes: WorkerAttributes): bigint {
 		const { baseExperience, typeMultiplier, growthRate } = workerData[workerAttributes.type];
 		const { level } = workerAttributes;
 
 		const experience = baseExperience * Math.pow(1 + growthRate, level) * typeMultiplier;
-		return Math.round(experience);
+		return BigInt(Math.round(experience));
 	}
 
 	public calculateNewMultipliers(workerAttributes: WorkerAttributes): {
@@ -39,8 +40,8 @@ export class StakeMethod extends Modules.BaseMethod {
 		const newCapMultiplier = capMultiplier * Math.pow(1 + multiplierGrowthRate, level);
 
 		return {
-			newRevMultiplier: Math.round(newRevMultiplier * 100) / 100, // Round to 2 decimal places
-			newCapMultiplier: Math.round(newCapMultiplier * 100) / 100, // Round to 2 decimal places
+			newRevMultiplier: Math.round(newRevMultiplier * 100) / 100,
+			newCapMultiplier: Math.round(newCapMultiplier * 100) / 100,
 		};
 	}
 
@@ -56,10 +57,33 @@ export class StakeMethod extends Modules.BaseMethod {
 		return baseCost;
 	}
 
-	public calculateRevenue(nftAttributes: BusinessAttributes): number {
+	public async calculateRevenue(
+		ctx: ImmutableMethodContext,
+		nft: Modules.NFT.NFT,
+		nftAttributes: BusinessAttributes,
+	): Promise<number> {
 		const { baseRevenue, typeMultiplier } = businessData[nftAttributes.type];
 		const { quantity, multiplier = 1 } = nftAttributes;
-		const revenue = baseRevenue * quantity * multiplier * typeMultiplier;
+
+		const workerStakedStore = this.stores.get(WorkerStakedStore);
+		const address = Buffer.from(cryptography.address.getKlayr32AddressFromAddress(nft.owner));
+
+		let workerMultiplier = 1;
+		const hasWorkerStaked = await workerStakedStore.has(ctx, address);
+		if (hasWorkerStaked) {
+			const stakedWorker = await workerStakedStore.get(ctx, address);
+			console.log({ stakedWorker });
+			const workerNft = await this.getNft(ctx, stakedWorker.nftID);
+			console.log({ workerNft });
+			const workerAttributes: WorkerAttributes = JSON.parse(
+				workerNft.attributesArray[0].attributes.toString(),
+			);
+			console.log({ workerAttributes });
+			workerMultiplier = workerAttributes.revMultiplier;
+		}
+		console.log({ workerMultiplier });
+
+		const revenue = baseRevenue * quantity * multiplier * typeMultiplier * workerMultiplier;
 		return revenue;
 	}
 
@@ -83,7 +107,7 @@ export class StakeMethod extends Modules.BaseMethod {
 		const { multiplier = 1, type, quantity } = attributes;
 		const { maxRevenue } = businessData[type];
 
-		const revenue = this.calculateRevenue(attributes);
+		const revenue = await this.calculateRevenue(ctx, nft, attributes);
 
 		const cappedRevenue = Math.min(timeDiff * revenue, maxRevenue * quantity * multiplier);
 		return Math.round(cappedRevenue);

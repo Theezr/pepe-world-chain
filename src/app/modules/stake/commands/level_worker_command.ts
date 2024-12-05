@@ -1,5 +1,5 @@
 /* eslint-disable class-methods-use-this */
-import { Modules, StateMachine } from 'klayr-sdk';
+import { cryptography, Modules, StateMachine } from 'klayr-sdk';
 import { levelWorkerSchema } from '../schemas';
 import { StakeMethod } from '../method';
 import { NFTMethod } from 'klayr-framework/dist-node/modules/nft';
@@ -30,13 +30,15 @@ export class LevelWorkerCommand extends Modules.BaseCommand {
 		const attributes: WorkerAttributes = JSON.parse(nft.attributesArray[0].attributes.toString());
 
 		const workerStakedStore = this.stores.get(WorkerStakedStore);
-		const hasWorkerStaked = await workerStakedStore.has(context, nft.owner);
+		const address = Buffer.from(cryptography.address.getKlayr32AddressFromAddress(nft.owner));
+
+		const hasWorkerStaked = await workerStakedStore.has(context, address);
 		if (!hasWorkerStaked) {
 			return { status: StateMachine.VerifyStatus.FAIL, error: new Error('Worker not staked') };
 		}
 
 		const experienceNeeded = this._method.calculateExperienceToNextLevel(attributes);
-		const stakedWorker = await workerStakedStore.get(context, nft.owner);
+		const stakedWorker = await workerStakedStore.get(context, address);
 		if (stakedWorker.experience < experienceNeeded) {
 			return { status: StateMachine.VerifyStatus.FAIL, error: new Error('Not enough experience') };
 		}
@@ -53,7 +55,7 @@ export class LevelWorkerCommand extends Modules.BaseCommand {
 
 		const newAttributes = JSON.stringify({
 			...attributes,
-			quantity: attributes.level + 1,
+			level: attributes.level + 1,
 			revMultiplier: newMultipliers.newRevMultiplier,
 			capMultiplier: newMultipliers.newCapMultiplier,
 		});
@@ -66,7 +68,9 @@ export class LevelWorkerCommand extends Modules.BaseCommand {
 				Buffer.from(newAttributes),
 			);
 			const workerStakedStore = this.stores.get(WorkerStakedStore);
-			await workerStakedStore.set(context, nft.owner, { nftID, experience: BigInt(0) });
+			const address = Buffer.from(cryptography.address.getKlayr32AddressFromAddress(nft.owner));
+
+			await workerStakedStore.set(context, address, { nftID, experience: BigInt(0) });
 		} catch (error) {
 			console.log('Error setting attributes:', error);
 			throw new Error('Error setting attributes');

@@ -32,7 +32,6 @@ export class CreateFirstBusinessCommand extends Modules.BaseCommand {
 		context: StateMachine.CommandVerifyContext<Params>,
 	): Promise<StateMachine.VerificationResult> {
 		const { recipient, type } = context.params;
-		console.log('recipient verify:', recipient);
 
 		if (!isValidBusinessType(type as string)) {
 			return {
