@@ -13,10 +13,16 @@
  */
 
 import { Plugins, Types, cryptography, validator as klayrvalidator, transactions } from 'klayr-sdk';
-import { authorizeParamsSchema, claimRevenueSchema, getNftsParamsSchema } from './schemas';
-import { DripPluginConfig, nftData, State } from './types';
+import {
+	authorizeParamsSchema,
+	claimRevenueSchema,
+	getNftsParamsSchema,
+	mintSchema,
+} from './schemas';
+import { DripPluginConfig, State } from './types';
+import { businessData } from '../../nftTypes';
 
-import { decodeAttributes, isValidNftType } from './helpers';
+import { decodeAttributes, isValidBusinessType } from './helpers';
 
 // disabled for type annotation
 // eslint-disable-next-line prefer-destructuring
@@ -93,10 +99,10 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 	}
 
 	public async mintPepeBusiness(context: Types.PluginEndpointContext): Promise<ReturnType> {
-		validator.validate(getNftsParamsSchema, context.params);
+		validator.validate(mintSchema, context.params);
 		const { address, type } = context.params;
 
-		if (!isValidNftType(type as string)) {
+		if (!isValidBusinessType(type as string)) {
 			throw new Error('Invalid business type');
 		}
 
@@ -109,15 +115,15 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 		});
 	}
 
-	public async mintFirstPepeWorker(context: Types.PluginEndpointContext): Promise<ReturnType> {
-		validator.validate(getNftsParamsSchema, context.params);
-		const { address } = context.params;
+	public async mintPepeWorker(context: Types.PluginEndpointContext): Promise<ReturnType> {
+		validator.validate(mintSchema, context.params);
+		const { address, type } = context.params;
 
 		return this._sendTransaction({
 			context,
 			module: 'stake',
 			command: 'createFirstPepe',
-			params: { recipient: address },
+			params: { recipient: address, type },
 			successMessage: 'Successfully created pepe worker tx',
 		});
 	}
@@ -200,33 +206,15 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 					};
 				});
 
-				let unclaimedRevenue = 0;
-				let upgradeCost = 0;
-				let revenue = 0;
 				if (decodedAttributesArray[0].module === 'business') {
-					unclaimedRevenue = await this._client.invoke('stake_getStakeRewardsForNft', {
-						nftID: nft.id,
-					});
-					upgradeCost = await this._client.invoke('stake_getUpgradeCost', {
-						nftID: nft.id,
-					});
-
-					revenue = await this._client.invoke('stake_getRevenue', {
-						nftID: nft.id,
-					});
+					return this.processBusinessNft(nft, decodedAttributesArray);
+				} else if (decodedAttributesArray[0].module === 'worker') {
+					return this.processWorkerNft(nft, decodedAttributesArray, address as string);
 				}
-				const nftDefaults = nftData[decodedAttributesArray[0].attributes.type];
-				const maxRevenue = nftDefaults?.maxRevenue ?? 0;
 
 				return {
 					...nft,
 					attributesArray: decodedAttributesArray,
-					maxRevenue: maxRevenue * decodedAttributesArray[0].attributes.quantity,
-					baseRevenue: nftDefaults?.baseRevenue ?? 0,
-					revenue: revenue,
-					upgradeCost,
-					unclaimedRevenue,
-					typeMultiplier: nftDefaults?.typeMultiplier ?? 1,
 				};
 			}),
 		);
@@ -287,5 +275,56 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 		} catch (error) {
 			throw new Error('Password given is not valid.');
 		}
+	}
+
+	private async processBusinessNft(nft: any, decodedAttributesArray: any[]): Promise<any> {
+		let unclaimedRevenue = 0;
+		let upgradeCost = 0;
+		let revenue = 0;
+
+		unclaimedRevenue = await this._client.invoke('stake_getStakeRewardsForNft', {
+			nftID: nft.id,
+		});
+		upgradeCost = await this._client.invoke('stake_getUpgradeCost', {
+			nftID: nft.id,
+		});
+		revenue = await this._client.invoke('stake_getRevenue', {
+			nftID: nft.id,
+		});
+
+		const nftDefaults = businessData[decodedAttributesArray[0].attributes.type];
+		const maxRevenue = nftDefaults?.maxRevenue ?? 0;
+
+		return {
+			...nft,
+			attributesArray: decodedAttributesArray,
+			maxRevenue: maxRevenue * decodedAttributesArray[0].attributes.quantity,
+			baseRevenue: nftDefaults?.baseRevenue ?? 0,
+			revenue: revenue,
+			upgradeCost,
+			unclaimedRevenue,
+			typeMultiplier: nftDefaults?.typeMultiplier ?? 1,
+		};
+	}
+
+	private async processWorkerNft(
+		nft: any,
+		decodedAttributesArray: any[],
+		address: string,
+	): Promise<any> {
+		const experienceToNextLevel = await this._client.invoke('stake_getExperienceToNextLevel', {
+			nftID: nft.id,
+		});
+
+		const experienceStakedWorker = await this._client.invoke('stake_getExperienceStakedWorker', {
+			address,
+		});
+
+		return {
+			...nft,
+			attributesArray: decodedAttributesArray,
+			experienceToNextLevel,
+			experience: experienceStakedWorker,
+		};
 	}
 }

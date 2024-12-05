@@ -4,7 +4,7 @@ import { upgradeBusinessSchema } from '../schemas';
 import { NFTMethod } from 'klayr-framework/dist-node/modules/nft';
 import { TokenMethod } from 'klayr-framework/dist-node/modules/token';
 import { StakeMethod } from '../method';
-import { NftAttributes } from '../types';
+import { BusinessAttributes } from '../types';
 import { StakeTimeStore } from '../stores/stakeTime';
 
 interface Params {
@@ -37,9 +37,9 @@ export class UpgradeBusinessCommand extends Modules.BaseCommand {
 		if (!nft) {
 			return { status: StateMachine.VerifyStatus.FAIL, error: new Error('NFT not found') };
 		}
-		const attributes: NftAttributes = JSON.parse(nft.attributesArray[0].attributes.toString());
+		const attributes: BusinessAttributes = JSON.parse(nft.attributesArray[0].attributes.toString());
 
-		const hasEnoughBalance = await this._method.checkForBalance(
+		const hasEnoughBalance = await this._method.checkForBalanceBusiness(
 			context,
 			nft.owner,
 			attributes.type,
@@ -56,14 +56,14 @@ export class UpgradeBusinessCommand extends Modules.BaseCommand {
 		const currentTime = context.header.timestamp;
 
 		const nft = await this._nftMethod.getNFT(context, nftID);
-		const attributes: NftAttributes = JSON.parse(nft.attributesArray[0].attributes.toString());
+		const attributes: BusinessAttributes = JSON.parse(nft.attributesArray[0].attributes.toString());
 
 		try {
 			await this._method.mintRewardsToUser(context, nftID, currentTime, nft.owner);
 			const stakeTimeStore = this.stores.get(StakeTimeStore);
 			await stakeTimeStore.set(context, nftID, { time: currentTime });
 
-			await this._method.burnFeeForRecipient(context, nft.owner, attributes);
+			await this._method.burnBusinessFee(context, nft.owner, attributes);
 		} catch (error) {
 			console.log('Error burning fee:', error);
 			throw new Error('Error burning fee');

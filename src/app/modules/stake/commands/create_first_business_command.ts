@@ -4,9 +4,10 @@ import { createBusinessSchema } from '../schemas';
 import { LENGTH_INDEX, NFTMethod } from 'klayr-framework/dist-node/modules/nft';
 import { BusinessStore } from '../stores/businessStore';
 import { StakeTimeStore } from '../stores/stakeTime';
-import { NftAttributes, nftData, NftType } from '../types';
+import { BusinessAttributes } from '../types';
 import { StakeMethod } from '../method';
-import { isValidNftType } from '../../../plugins/drip/helpers';
+import { isValidBusinessType } from '../../../plugins/drip/helpers';
+import { businessData, BusinessType } from '../../../nftTypes';
 
 interface Params {
 	recipient: Buffer;
@@ -33,7 +34,7 @@ export class CreateFirstBusinessCommand extends Modules.BaseCommand {
 		const { recipient, type } = context.params;
 		console.log('recipient verify:', recipient);
 
-		if (!isValidNftType(type as string)) {
+		if (!isValidBusinessType(type as string)) {
 			return {
 				status: StateMachine.VerifyStatus.FAIL,
 				error: new Error('Invalid type'),
@@ -51,11 +52,11 @@ export class CreateFirstBusinessCommand extends Modules.BaseCommand {
 			};
 		}
 
-		if (type === NftType.LemonadeStand) {
+		if (type === BusinessType.LemonadeStand) {
 			return { status: StateMachine.VerifyStatus.OK };
 		}
 
-		const hasEnoughBalance = await this._method.checkForBalance(context, recipient, type);
+		const hasEnoughBalance = await this._method.checkForBalanceBusiness(context, recipient, type);
 		if (!hasEnoughBalance) {
 			return { status: StateMachine.VerifyStatus.FAIL, error: new Error('Insufficient funds') };
 		}
@@ -66,9 +67,9 @@ export class CreateFirstBusinessCommand extends Modules.BaseCommand {
 	public async execute(context: StateMachine.CommandExecuteContext<Params>): Promise<void> {
 		const { recipient, type } = context.params;
 
-		const data = nftData[type];
-		const attributesArray = this._method.createAttributeArray(data);
-		const attributes: NftAttributes = JSON.parse(attributesArray[0].attributes.toString());
+		const data = businessData[type];
+		const attributesArray = this._method.createBusinessAttributes(data);
+		const attributes: BusinessAttributes = data.attributes;
 
 		const index = await this._nftMethod.getNextAvailableIndex(context, data.collectionID);
 		const indexBytes = Buffer.alloc(LENGTH_INDEX);
@@ -76,8 +77,8 @@ export class CreateFirstBusinessCommand extends Modules.BaseCommand {
 		const nftID = Buffer.concat([ownChainID, data.collectionID, indexBytes]);
 
 		try {
-			if (type !== NftType.LemonadeStand) {
-				await this._method.burnFeeForRecipient(context, recipient, attributes);
+			if (type !== BusinessType.LemonadeStand) {
+				await this._method.burnBusinessFee(context, recipient, attributes);
 			}
 			await this._nftMethod.create(
 				context.getMethodContext(),

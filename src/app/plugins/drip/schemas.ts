@@ -88,6 +88,23 @@ export const getNftsParamsSchema = {
 	},
 };
 
+export const mintSchema = {
+	$id: '/klayr/faucet/fund',
+	type: 'object',
+	required: ['address', 'type'],
+	properties: {
+		address: {
+			type: 'string',
+			format: 'klayr32',
+			fieldNumber: 1,
+		},
+		type: {
+			type: 'string',
+			fieldNumber: 2,
+		},
+	},
+};
+
 export const authorizeParamsSchema = {
 	$id: '/klayr/faucet/auth',
 	type: 'object',
