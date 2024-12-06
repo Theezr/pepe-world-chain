@@ -22,7 +22,7 @@ import {
 import { DripPluginConfig, State } from './types';
 import { businessData } from '../../nftTypes';
 
-import { decodeAttributes, isValidBusinessType } from './helpers';
+import { decodeAttributes, isValidBusinessType, isValidWorkerType } from './helpers';
 
 // disabled for type annotation
 // eslint-disable-next-line prefer-destructuring
@@ -118,6 +118,10 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 	public async mintPepeWorker(context: Types.PluginEndpointContext): Promise<ReturnType> {
 		validator.validate(mintSchema, context.params);
 		const { address, type } = context.params;
+
+		if (!isValidWorkerType(type as string)) {
+			throw new Error('Invalid worker type');
+		}
 
 		return this._sendTransaction({
 			context,
