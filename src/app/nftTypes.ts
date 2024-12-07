@@ -4,11 +4,13 @@ export enum BusinessType {
 	PizzaParlor = 'pizzaParlor',
 	BurgerJoint = 'burgerJoint',
 	SushiBar = 'sushiBar',
+	Brothel = 'brothel',
 }
 
 export enum WorkerType {
 	ScuffedPimp = 'scuffedPimp',
 	NormiePimp = 'normiePimp',
+	ChadPimp = 'chadPimp',
 	// HipsterPimp = 'hipsterPimp',
 }
 
@@ -17,7 +19,7 @@ export const workerData = {
 		baseCost: 0,
 		growthRate: 0.2,
 		typeMultiplier: 1.0,
-		baseExperience: 100,
+		baseExperience: 1_000_000,
 		multiplierGrowthRate: 0.05,
 		collectionID: Buffer.from('10000000', 'hex'),
 		module: 'worker',
@@ -31,10 +33,10 @@ export const workerData = {
 		},
 	},
 	[WorkerType.NormiePimp]: {
-		baseCost: 1_000,
+		baseCost: 10_000_000,
 		growthRate: 0.4,
 		typeMultiplier: 1.5,
-		baseExperience: 100,
+		baseExperience: 10_000_000,
 		multiplierGrowthRate: 0.1,
 		collectionID: Buffer.from('20000000', 'hex'),
 		module: 'worker',
@@ -45,6 +47,23 @@ export const workerData = {
 			level: 1,
 			revMultiplier: 1.5,
 			capMultiplier: 1.5,
+		},
+	},
+	[WorkerType.ChadPimp]: {
+		baseCost: 100_000_000,
+		growthRate: 0.6,
+		typeMultiplier: 2.0,
+		baseExperience: 100_000_000,
+		multiplierGrowthRate: 0.25,
+		collectionID: Buffer.from('30000000', 'hex'),
+		module: 'worker',
+		attributes: {
+			name: 'Chad Pimp',
+			type: WorkerType.ChadPimp,
+			imageUrl: '/assets/pepe-chad-pimp.jpg',
+			level: 1,
+			revMultiplier: 2.5,
+			capMultiplier: 2.5,
 		},
 	},
 };
@@ -122,6 +141,21 @@ export const businessData = {
 			name: 'Sushi Bar',
 			type: BusinessType.SushiBar,
 			imageUrl: '/assets/pepe-sushibar.jpg',
+			quantity: 1,
+		},
+	},
+	[BusinessType.Brothel]: {
+		baseCost: 100_000_000,
+		growthRate: 2,
+		typeMultiplier: 10,
+		baseRevenue: 1_000,
+		maxRevenue: 10_000_000,
+		collectionID: Buffer.from('00000006', 'hex'),
+		module: 'business',
+		attributes: {
+			name: "Pepe's Dream",
+			type: BusinessType.Brothel,
+			imageUrl: '/assets/pepe-brothel.jpg',
 			quantity: 1,
 		},
 	},
