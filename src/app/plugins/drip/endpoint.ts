@@ -18,6 +18,7 @@ import {
 	claimRevenueSchema,
 	getNftsParamsSchema,
 	mintSchema,
+	stakeSchema,
 } from './schemas';
 import { DripPluginConfig, State } from './types';
 import { businessData } from '../../nftTypes';
@@ -145,29 +146,16 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 		});
 	}
 
-	public async unstakePepe(context: Types.PluginEndpointContext): Promise<ReturnType> {
-		validator.validate(claimRevenueSchema, context.params);
-		const { nftID } = context.params;
+	public async stakeUnstakePepe(context: Types.PluginEndpointContext): Promise<ReturnType> {
+		validator.validate(stakeSchema, context.params);
+		const { nftID, method } = context.params;
 
 		return this._sendTransaction({
 			context,
 			module: 'stake',
-			command: 'unstakePepe',
+			command: method as string,
 			params: { nftID },
 			successMessage: 'Successfully unstaked pepe',
-		});
-	}
-
-	public async stakePepe(context: Types.PluginEndpointContext): Promise<ReturnType> {
-		validator.validate(claimRevenueSchema, context.params);
-		const { nftID } = context.params;
-
-		return this._sendTransaction({
-			context,
-			module: 'stake',
-			command: 'stakePepe',
-			params: { nftID },
-			successMessage: 'Successfully staked pepe',
 		});
 	}
 
@@ -239,8 +227,8 @@ export class Endpoint extends Plugins.BasePluginEndpoint {
 		const workers = decodedNfts.filter(nft => nft.attributesArray[0].module === 'worker');
 		const businesses = decodedNfts.filter(nft => nft.attributesArray[0].module === 'business');
 
-		console.log('Worker NFTs:', workers);
-		console.log('Business NFTs:', businesses);
+		// console.log('Worker NFTs:', workers);
+		// console.log('Business NFTs:', businesses);
 
 		return {
 			command: 'nfts',

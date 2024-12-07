@@ -84,9 +84,17 @@ export class CreateFirstPepeCommand extends Modules.BaseCommand {
 			const workerStore = this.stores.get(WorkerStore);
 			await workerStore.set(context, combinedKey, { minted: true });
 
-			const address = cryptography.address.getKlayr32AddressFromAddress(recipient);
+			const address = Buffer.from(cryptography.address.getKlayr32AddressFromAddress(recipient));
 			const workerStakedStore = this.stores.get(WorkerStakedStore);
-			await workerStakedStore.set(context, Buffer.from(address), {
+
+			const hasWorkerStaked = await workerStakedStore.has(context, address);
+			if (hasWorkerStaked) {
+				const stakedWorker = await workerStakedStore.get(context, address);
+				await this._nftMethod.unlock(context, this.name, stakedWorker.nftID);
+				await workerStakedStore.del(context, address);
+			}
+
+			await workerStakedStore.set(context, address, {
 				nftID,
 				experience: BigInt(0),
 				revMultiplier: attributes.revMultiplier.toString(),

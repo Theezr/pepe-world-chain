@@ -53,21 +53,26 @@ export class StakeWorkerCommand extends Modules.BaseCommand {
 		const workerStakedStore = this.stores.get(WorkerStakedStore);
 
 		// delete staked worker if it exists
-		const hasWorkerStaked = await workerStakedStore.has(context, address);
-		if (!hasWorkerStaked) {
-			const stakedWorker = await workerStakedStore.get(context, address);
-			await this._nftMethod.unlock(context, this.name, stakedWorker.nftID);
-			await workerStakedStore.del(context, address);
+		try {
+			const hasWorkerStaked = await workerStakedStore.has(context, address);
+			if (hasWorkerStaked) {
+				const stakedWorker = await workerStakedStore.get(context, address);
+				await this._nftMethod.unlock(context, this.name, stakedWorker.nftID);
+				await workerStakedStore.del(context, address);
+			}
+
+			// stake worker
+			await workerStakedStore.set(context, Buffer.from(address), {
+				nftID,
+				experience: BigInt(0),
+				revMultiplier: attributes.revMultiplier.toString(),
+				capMultiplier: attributes.capMultiplier.toString(),
+			});
+
+			await this._nftMethod.lock(context, this.name, nftID);
+		} catch (e) {
+			console.log('error:', e);
+			throw new Error('Error staking worker');
 		}
-
-		// stake worker
-		await workerStakedStore.set(context, Buffer.from(address), {
-			nftID,
-			experience: BigInt(0),
-			revMultiplier: attributes.revMultiplier.toString(),
-			capMultiplier: attributes.capMultiplier.toString(),
-		});
-
-		await this._nftMethod.lock(context, this.name, nftID);
 	}
 }

@@ -130,3 +130,19 @@ export const claimRevenueSchema = {
 	},
 	required: ['nftID'],
 };
+
+export const stakeSchema = {
+	$id: 'StakeCommand',
+	type: 'object',
+	properties: {
+		nftID: {
+			dataType: 'string',
+			fieldNumber: 1,
+		},
+		method: {
+			dataType: 'string',
+			fieldNumber: 2,
+		},
+	},
+	required: ['nftID', 'method'],
+};
