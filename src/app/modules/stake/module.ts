@@ -7,14 +7,16 @@ import { CreateFirstBusinessCommand } from './commands/create_first_business_com
 import { CreateFirstPepeCommand } from './commands/create_first_pepe_command';
 import { LevelWorkerCommand } from './commands/level_worker_command';
 import { StakePepeCommand } from './commands/stake_pepe_command';
+import { StakeWorkerCommand } from './commands/stake_worker_command';
 import { UnstakePepeCommand } from './commands/unstake_pepe_command';
+import { UnstakeWorkerCommand } from './commands/unstake_worker_command';
 import { UpgradeBusinessCommand } from './commands/upgrade_business_command';
 import { StakeEndpoint } from './endpoint';
 import { StakeMethod } from './method';
 import { BusinessStore } from './stores/businessStore';
 import { StakeTimeStore } from './stores/stakeTime';
-import { WorkerStore } from './stores/workerStore';
 import { WorkerStakedStore } from './stores/workerStakedStore';
+import { WorkerStore } from './stores/workerStore';
 
 export class StakeModule extends Modules.BaseModule {
 	public endpoint = new StakeEndpoint(this.stores, this.offchainStores);
@@ -27,6 +29,8 @@ export class StakeModule extends Modules.BaseModule {
 	public _createFirstBusinessCommand = new CreateFirstBusinessCommand(this.stores, this.events);
 	public _upgradeBusinessCommand = new UpgradeBusinessCommand(this.stores, this.events);
 	public _levelWorkerCommand = new LevelWorkerCommand(this.stores, this.events);
+	public _stakeWorkerCommand = new StakeWorkerCommand(this.stores, this.events);
+	public _unstakeWorkerCommand = new UnstakeWorkerCommand(this.stores, this.events);
 
 	public commands = [
 		this._stakePepeCommand,
@@ -36,6 +40,8 @@ export class StakeModule extends Modules.BaseModule {
 		this._createFirstBusinessCommand,
 		this._upgradeBusinessCommand,
 		this._levelWorkerCommand,
+		this._stakeWorkerCommand,
+		this._unstakeWorkerCommand,
 	];
 
 	public _nftMethod!: NFTMethod;
@@ -43,7 +49,6 @@ export class StakeModule extends Modules.BaseModule {
 
 	public constructor() {
 		super();
-		// registeration of stores and events
 		this.stores.register(StakeTimeStore, new StakeTimeStore(this.name, 0));
 		this.stores.register(WorkerStore, new WorkerStore(this.name, 1));
 		this.stores.register(BusinessStore, new BusinessStore(this.name, 2));
@@ -63,6 +68,15 @@ export class StakeModule extends Modules.BaseModule {
 
 		this._unstakePepeCommand.addDependencies({
 			method: this.method,
+			nftMethod: this._nftMethod,
+		});
+
+		this._stakeWorkerCommand.addDependencies({
+			method: this.method,
+			nftMethod: this._nftMethod,
+		});
+
+		this._unstakeWorkerCommand.addDependencies({
 			nftMethod: this._nftMethod,
 		});
 
