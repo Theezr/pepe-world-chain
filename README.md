@@ -65,6 +65,8 @@ yarn build && ./bin/run start --config config/custom_config.json --overwrite-con
 ./bin/run endpoint:invoke stake_getStakeRewardsForNft '{"nftID": "01371337310000000000000000"}'
 ./bin/run endpoint:invoke stake_getUpgradeCost '{"nftID": "01371337000000010000000000000001"}'
 ./bin/run endpoint:invoke stake_getAllNftTypes  --json --pretty
+./bin/run endpoint:invoke stake_getExperienceToNextLevel '{"nftID": "01371337100000000000000000000001"}'
+./bin/run endpoint:invoke stake_getExperienceStakedWorker '{"address": "kly2jf2urs6mt2puqprfedtj47knp66xye4zjedm2"}'
 ```
 
 ## Drip Plugin
@@ -97,7 +99,7 @@ yarn build && ./bin/run start --config config/custom_config.json --overwrite-con
 ### Get nft balances
 
 ```
-./bin/run endpoint:invoke nft_getNFTs '{"address":"kly22hwq7ejuopapxz7m8tq6w3aokvmym36vjkjot"}' --pretty
+./bin/run endpoint:invoke nft_getNFTs '{"address":"kly966pptt6boncn4y5tc9ynd9ac9dcsxvkznqctp"}' --pretty
 ```
 
 ### Add a new module

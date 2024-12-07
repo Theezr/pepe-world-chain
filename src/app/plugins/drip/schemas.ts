@@ -88,6 +88,23 @@ export const getNftsParamsSchema = {
 	},
 };
 
+export const mintSchema = {
+	$id: '/klayr/faucet/fund',
+	type: 'object',
+	required: ['address', 'type'],
+	properties: {
+		address: {
+			type: 'string',
+			format: 'klayr32',
+			fieldNumber: 1,
+		},
+		type: {
+			type: 'string',
+			fieldNumber: 2,
+		},
+	},
+};
+
 export const authorizeParamsSchema = {
 	$id: '/klayr/faucet/auth',
 	type: 'object',
@@ -112,4 +129,20 @@ export const claimRevenueSchema = {
 		},
 	},
 	required: ['nftID'],
+};
+
+export const stakeSchema = {
+	$id: 'StakeCommand',
+	type: 'object',
+	properties: {
+		nftID: {
+			dataType: 'string',
+			fieldNumber: 1,
+		},
+		method: {
+			dataType: 'string',
+			fieldNumber: 2,
+		},
+	},
+	required: ['nftID', 'method'],
 };

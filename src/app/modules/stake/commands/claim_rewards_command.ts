@@ -1,9 +1,11 @@
 /* eslint-disable class-methods-use-this */
-import { Modules, StateMachine } from 'klayr-sdk';
+import { cryptography, Modules, StateMachine } from 'klayr-sdk';
 import { claimRewardsSchema } from '../schemas';
 import { NFTMethod } from 'klayr-framework/dist-node/modules/nft';
 import { StakeMethod } from '../method';
 import { StakeTimeStore } from '../stores/stakeTime';
+import { WorkerStakedStore } from '../stores/workerStakedStore';
+import { WorkerAttributes } from '../types';
 
 interface Params {
 	nftID: Buffer;
@@ -51,15 +53,39 @@ export class ClaimRewardsCommand extends Modules.BaseCommand {
 		return { status: StateMachine.VerifyStatus.OK };
 	}
 
+	// TODO: Clean up implementation (to methods)
 	public async execute(context: StateMachine.CommandExecuteContext<Params>): Promise<void> {
 		const { nftID } = context.params;
 		context.logger.info('EXECUTE claimRewards for NFT', nftID.toString());
 		const currentTime = context.header.timestamp;
 
 		const nft = await this._nftMethod.getNFT(context, nftID);
-		await this._method.mintRewardsToUser(context, nftID, currentTime, nft.owner);
+		const rewards = await this._method.mintRewardsToUser(context, nftID, currentTime, nft.owner);
 
 		const stakeTimeStore = this.stores.get(StakeTimeStore);
 		await stakeTimeStore.set(context, nftID, { time: context.header.timestamp });
+
+		// TODO: double code in upgrade business
+		const workerStakedStore = this.stores.get(WorkerStakedStore);
+		const address = Buffer.from(cryptography.address.getKlayr32AddressFromAddress(nft.owner));
+
+		const hasWorkerStaked = await workerStakedStore.has(context, address);
+		if (hasWorkerStaked) {
+			const workerStaked = await workerStakedStore.get(context, address);
+			const nft = await this._nftMethod.getNFT(context, workerStaked.nftID);
+
+			const attributes: WorkerAttributes = JSON.parse(nft.attributesArray[0].attributes.toString());
+			const experienceNeeded = this._method.calculateExperienceToNextLevel(attributes);
+
+			const newExperience = workerStaked.experience + rewards;
+			const experience = newExperience >= experienceNeeded ? experienceNeeded : newExperience;
+
+			await workerStakedStore.set(context, address, {
+				nftID: workerStaked.nftID,
+				experience,
+				capMultiplier: workerStaked.capMultiplier,
+				revMultiplier: workerStaked.revMultiplier,
+			});
+		}
 	}
 }

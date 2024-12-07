@@ -1,12 +1,14 @@
 import { NFTMethod } from 'klayr-framework/dist-node/modules/nft';
-import { Modules } from 'klayr-sdk';
+import { cryptography, Modules } from 'klayr-sdk';
 import { StakeTimeStore } from './stores/stakeTime';
 import {
 	CommandExecuteContext,
 	CommandVerifyContext,
 	ImmutableMethodContext,
 } from 'klayr-framework/dist-node/state_machine';
-import { NftAttributes, nftData } from './types';
+import { BusinessAttributes, WorkerAttributes } from './types';
+import { businessData, workerData } from '../../nftTypes';
+import { WorkerStakedStore } from './stores/workerStakedStore';
 
 const stakeRewardToken = Buffer.from('0137133700000000', 'hex');
 
@@ -19,17 +21,62 @@ export class StakeMethod extends Modules.BaseMethod {
 		this._tokenMethod = args.tokenMethod;
 	}
 
-	public calculateCost(nftAttributes: NftAttributes): number {
-		const { baseCost, growthRate, typeMultiplier } = nftData[nftAttributes.type];
+	public calculateExperienceToNextLevel(workerAttributes: WorkerAttributes): bigint {
+		const { baseExperience, typeMultiplier, growthRate } = workerData[workerAttributes.type];
+		const { level } = workerAttributes;
+
+		const experience = baseExperience * Math.pow(1 + growthRate, level) * typeMultiplier;
+		return BigInt(Math.round(experience));
+	}
+
+	public calculateNewMultipliers(workerAttributes: WorkerAttributes): {
+		newRevMultiplier: number;
+		newCapMultiplier: number;
+	} {
+		const { multiplierGrowthRate } = workerData[workerAttributes.type];
+		const { revMultiplier, capMultiplier, level } = workerAttributes;
+
+		const newRevMultiplier = revMultiplier * Math.pow(1 + multiplierGrowthRate, level);
+		const newCapMultiplier = capMultiplier * Math.pow(1 + multiplierGrowthRate, level);
+
+		return {
+			newRevMultiplier: Math.round(newRevMultiplier * 100) / 100,
+			newCapMultiplier: Math.round(newCapMultiplier * 100) / 100,
+		};
+	}
+
+	public calculateCostBusiness(nftAttributes: BusinessAttributes): number {
+		const { baseCost, growthRate, typeMultiplier } = businessData[nftAttributes.type];
 		const { quantity } = nftAttributes;
 		const cost = baseCost * Math.pow(1 + growthRate, quantity - 1) * typeMultiplier;
 		return Math.round(cost);
 	}
 
-	public calculateRevenue(nftAttributes: NftAttributes): number {
-		const { baseRevenue, typeMultiplier } = nftData[nftAttributes.type];
+	public calculateCostWorker(nftAttributes: WorkerAttributes): number {
+		const { baseCost } = workerData[nftAttributes.type];
+		return baseCost;
+	}
+
+	public async calculateRevenue(
+		ctx: ImmutableMethodContext,
+		nft: Modules.NFT.NFT,
+		nftAttributes: BusinessAttributes,
+	): Promise<number> {
+		const { baseRevenue, typeMultiplier } = businessData[nftAttributes.type];
 		const { quantity, multiplier = 1 } = nftAttributes;
-		const revenue = baseRevenue * quantity * multiplier * typeMultiplier;
+
+		const workerStakedStore = this.stores.get(WorkerStakedStore);
+		const address = Buffer.from(cryptography.address.getKlayr32AddressFromAddress(nft.owner));
+
+		let workerMultiplier = 1;
+		const hasWorkerStaked = await workerStakedStore.has(ctx, address);
+		if (hasWorkerStaked) {
+			const stakedWorker = await workerStakedStore.get(ctx, address);
+			const revMultiplier = stakedWorker?.revMultiplier ?? 1;
+			workerMultiplier = Number(revMultiplier);
+		}
+
+		const revenue = baseRevenue * quantity * multiplier * typeMultiplier * workerMultiplier;
 		return revenue;
 	}
 
@@ -51,12 +98,26 @@ export class StakeMethod extends Modules.BaseMethod {
 		const nft = await this._nftMethod.getNFT(ctx, nftID);
 		const attributes = JSON.parse(nft.attributesArray[0].attributes.toString());
 		const { multiplier = 1, type, quantity } = attributes;
-		const { maxRevenue } = nftData[type];
 
-		const revenue = this.calculateRevenue(attributes);
-		console.log({ revenue, timeDiff });
+		const { maxRevenue } = businessData[type];
+		const workerStakedStore = this.stores.get(WorkerStakedStore);
+		const address = Buffer.from(cryptography.address.getKlayr32AddressFromAddress(nft.owner));
 
-		const cappedRevenue = Math.min(timeDiff * revenue, maxRevenue * quantity * multiplier);
+		let capMultiplier = 1;
+		const hasWorkerStaked = await workerStakedStore.has(ctx, address);
+		if (hasWorkerStaked) {
+			const stakedWorker = await workerStakedStore.get(ctx, address);
+			const caMultiplier = stakedWorker?.capMultiplier ?? 1;
+
+			capMultiplier = Number(caMultiplier);
+		}
+
+		const revenue = await this.calculateRevenue(ctx, nft, attributes);
+
+		const cappedRevenue = Math.min(
+			timeDiff * revenue,
+			maxRevenue * capMultiplier * quantity * multiplier,
+		);
 		return Math.round(cappedRevenue);
 	}
 
@@ -65,25 +126,24 @@ export class StakeMethod extends Modules.BaseMethod {
 		nftID: Buffer,
 		currentTime: number,
 		userAddress: Buffer,
-	): Promise<void> {
+	): Promise<bigint> {
 		const rewards = await this.getStakeRewardsForNft(ctx, nftID, currentTime);
 
 		await this._tokenMethod.initializeUserAccount(ctx, userAddress, stakeRewardToken);
-
 		await this._tokenMethod.mint(ctx, userAddress, stakeRewardToken, BigInt(rewards));
 
-		console.log(`minted ${rewards}`);
+		return BigInt(rewards);
 	}
 
-	public async checkForBalance(
+	public async checkForBalanceBusiness(
 		ctx: CommandVerifyContext<any>,
 		userAddress: Buffer,
 		type: string,
 	): Promise<boolean> {
-		const attributes: NftAttributes = JSON.parse(
-			this.createAttributeArray(nftData[type])[0].attributes.toString(),
-		);
-		const fee = this.calculateCost(attributes);
+		const data = businessData[type];
+		const attributes = data.attributes;
+		const fee = this.calculateCostBusiness(attributes);
+		if (fee === 0) return true;
 
 		const userBalance = await this._tokenMethod.getAvailableBalance(
 			ctx,
@@ -94,18 +154,50 @@ export class StakeMethod extends Modules.BaseMethod {
 		return BigInt(userBalance) > BigInt(fee);
 	}
 
-	public async burnFeeForRecipient(
+	public async checkForBalanceWorker(
+		ctx: CommandVerifyContext<any>,
+		userAddress: Buffer,
+		type: string,
+	): Promise<boolean> {
+		const data = workerData[type];
+		const attributes = data.attributes;
+		const fee = this.calculateCostWorker(attributes);
+		if (fee === 0) return true;
+
+		const userBalance = await this._tokenMethod.getAvailableBalance(
+			ctx,
+			userAddress,
+			stakeRewardToken,
+		);
+
+		return BigInt(userBalance) > BigInt(fee);
+	}
+
+	public async burnBusinessFee(
 		ctx: CommandExecuteContext<any>,
 		userAddress: Buffer,
-		attributes: NftAttributes,
+		attributes: BusinessAttributes,
 	): Promise<void> {
-		const fee = this.calculateCost(attributes);
+		const fee = this.calculateCostBusiness(attributes);
+		if (fee === 0) return;
 
 		await this._tokenMethod.initializeUserAccount(ctx, userAddress, stakeRewardToken);
 		await this._tokenMethod.burn(ctx, userAddress, stakeRewardToken, BigInt(fee));
 	}
 
-	public createAttributeArray(nftData: any) {
+	public async burnWorkerFee(
+		ctx: CommandExecuteContext<any>,
+		userAddress: Buffer,
+		attributes: WorkerAttributes,
+	): Promise<void> {
+		const fee = this.calculateCostWorker(attributes);
+		if (fee === 0) return;
+
+		await this._tokenMethod.initializeUserAccount(ctx, userAddress, stakeRewardToken);
+		await this._tokenMethod.burn(ctx, userAddress, stakeRewardToken, BigInt(fee));
+	}
+
+	public createBusinessAttributes(nftData: any) {
 		return [
 			{
 				module: nftData.module,
@@ -115,6 +207,24 @@ export class StakeMethod extends Modules.BaseMethod {
 						type: nftData.attributes.type,
 						imageUrl: nftData.attributes.imageUrl,
 						quantity: nftData.attributes.quantity,
+					}),
+				),
+			},
+		];
+	}
+
+	public createWorkerAttributes(nftData: any) {
+		return [
+			{
+				module: nftData.module,
+				attributes: Buffer.from(
+					JSON.stringify({
+						name: nftData.attributes.name,
+						type: nftData.attributes.type,
+						imageUrl: nftData.attributes.imageUrl,
+						level: nftData.attributes.level,
+						revMultiplier: nftData.attributes.revMultiplier,
+						capMultiplier: nftData.attributes.capMultiplier,
 					}),
 				),
 			},

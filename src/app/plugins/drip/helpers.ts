@@ -1,5 +1,4 @@
-import { NftType } from './types';
-
+import { BusinessType, WorkerType } from '../../nftTypes';
 export function decodeAttributes(hexString: string) {
 	if (!hexString) return {};
 
@@ -13,6 +12,10 @@ export function wait(ms: number) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export function isValidNftType(type: string): boolean {
-	return Object.values(NftType).includes(type as NftType);
+export function isValidBusinessType(type: string): boolean {
+	return Object.values(BusinessType).includes(type as BusinessType);
+}
+
+export function isValidWorkerType(type: string): boolean {
+	return Object.values(WorkerType).includes(type as WorkerType);
 }
