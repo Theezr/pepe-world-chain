@@ -34,7 +34,7 @@ export const workerData = {
 	},
 	[WorkerType.NormiePimp]: {
 		baseCost: 10_000_000,
-		growthRate: 0.4,
+		growthRate: 0.35,
 		typeMultiplier: 1.5,
 		baseExperience: 10_000_000,
 		multiplierGrowthRate: 0.1,
@@ -51,7 +51,7 @@ export const workerData = {
 	},
 	[WorkerType.ChadPimp]: {
 		baseCost: 100_000_000,
-		growthRate: 0.6,
+		growthRate: 0.5,
 		typeMultiplier: 2.0,
 		baseExperience: 100_000_000,
 		multiplierGrowthRate: 0.25,
@@ -71,7 +71,7 @@ export const workerData = {
 export const businessData = {
 	[BusinessType.LemonadeStand]: {
 		baseCost: 100,
-		growthRate: 0.2,
+		growthRate: 0.15,
 		typeMultiplier: 1.0,
 		baseRevenue: 1,
 		maxRevenue: 4_000,
@@ -86,10 +86,10 @@ export const businessData = {
 	},
 	[BusinessType.CoffeeShop]: {
 		baseCost: 1_000,
-		growthRate: 0.25,
+		growthRate: 0.2,
 		typeMultiplier: 1.2,
-		baseRevenue: 3,
-		maxRevenue: 20_000,
+		baseRevenue: 6,
+		maxRevenue: 40_000,
 		collectionID: Buffer.from('00000002', 'hex'),
 		module: 'business',
 		attributes: {
@@ -101,10 +101,10 @@ export const businessData = {
 	},
 	[BusinessType.PizzaParlor]: {
 		baseCost: 20_000,
-		growthRate: 0.35,
+		growthRate: 0.25,
 		typeMultiplier: 1.5,
-		baseRevenue: 7,
-		maxRevenue: 35_000,
+		baseRevenue: 10,
+		maxRevenue: 150_000,
 		collectionID: Buffer.from('00000003', 'hex'),
 		module: 'business',
 		attributes: {
@@ -116,10 +116,10 @@ export const businessData = {
 	},
 	[BusinessType.BurgerJoint]: {
 		baseCost: 100_000,
-		growthRate: 0.5,
-		typeMultiplier: 1.8,
-		baseRevenue: 12,
-		maxRevenue: 50_000,
+		growthRate: 0.4,
+		typeMultiplier: 2.0,
+		baseRevenue: 20,
+		maxRevenue: 250_000,
 		collectionID: Buffer.from('00000004', 'hex'),
 		module: 'business',
 		attributes: {
@@ -131,10 +131,10 @@ export const businessData = {
 	},
 	[BusinessType.SushiBar]: {
 		baseCost: 200_000,
-		growthRate: 0.8,
-		typeMultiplier: 2.5,
-		baseRevenue: 20,
-		maxRevenue: 125_000,
+		growthRate: 0.6,
+		typeMultiplier: 3,
+		baseRevenue: 50,
+		maxRevenue: 500_000,
 		collectionID: Buffer.from('00000005', 'hex'),
 		module: 'business',
 		attributes: {
@@ -146,7 +146,7 @@ export const businessData = {
 	},
 	[BusinessType.Brothel]: {
 		baseCost: 100_000_000,
-		growthRate: 2,
+		growthRate: 1,
 		typeMultiplier: 10,
 		baseRevenue: 1_000,
 		maxRevenue: 10_000_000,
