@@ -86,7 +86,7 @@ export const businessData = {
 	},
 	[BusinessType.CoffeeShop]: {
 		baseCost: 1_000,
-		growthRate: 0.2,
+		growthRate: 0.18,
 		typeMultiplier: 1.2,
 		baseRevenue: 6,
 		maxRevenue: 40_000,
@@ -101,7 +101,7 @@ export const businessData = {
 	},
 	[BusinessType.PizzaParlor]: {
 		baseCost: 20_000,
-		growthRate: 0.25,
+		growthRate: 0.2,
 		typeMultiplier: 1.5,
 		baseRevenue: 10,
 		maxRevenue: 150_000,
@@ -116,7 +116,7 @@ export const businessData = {
 	},
 	[BusinessType.BurgerJoint]: {
 		baseCost: 100_000,
-		growthRate: 0.4,
+		growthRate: 0.3,
 		typeMultiplier: 2.0,
 		baseRevenue: 20,
 		maxRevenue: 250_000,
@@ -131,7 +131,7 @@ export const businessData = {
 	},
 	[BusinessType.SushiBar]: {
 		baseCost: 200_000,
-		growthRate: 0.6,
+		growthRate: 0.45,
 		typeMultiplier: 3,
 		baseRevenue: 50,
 		maxRevenue: 500_000,
@@ -146,7 +146,7 @@ export const businessData = {
 	},
 	[BusinessType.Brothel]: {
 		baseCost: 100_000_000,
-		growthRate: 1,
+		growthRate: 0.8,
 		typeMultiplier: 10,
 		baseRevenue: 1_000,
 		maxRevenue: 10_000_000,
